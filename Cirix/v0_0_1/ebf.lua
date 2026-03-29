@@ -15,6 +15,16 @@ function findItem(targetName)
   return nil
 end
 
+-- Select empty
+function selectEmpty()
+  for slot = 1,robot.inventorySize(),1 do
+    if ic.getStackInInternalSlot(slot) == nil then
+      robot.select(slot)
+      break
+    end
+  end
+end
+
 -- Shortened common functions
 function f()
   robot.forward()
@@ -196,7 +206,7 @@ function buildEBF()
   robot.select(findItem("Muffler Hatch (LV)"))
   robot.placeDown()
   robot.select(findItem("Wrench"))
-  robot.useDown(sides.up)
+  robot.useDown(1)
   b()
   d()
   tr()
@@ -223,6 +233,8 @@ function buildEBF()
   robot.select(findItem("BrainTech Aerospace Advanced Reinforced Duct Tape FAL-84"))
   ic.equip()
   robot.use(2)
+  selectEmpty()
+  ic.equip()
   tl()
   f()
   f()
