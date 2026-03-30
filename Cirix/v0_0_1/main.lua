@@ -1,3 +1,4 @@
+-- wget https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/main.lua && main
 local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
@@ -13,7 +14,7 @@ function tl()robot.turnLeft()end
 function ta()robot.turnAround()end
 function getSlot(n)return ic.getStackInInternalSlot(n)end
 function inv()return robot.inventorySize()end
-function swap(n)robot.transferTo(n)end
+function swap(n,n2)robot.transferTo(n,n2)end
 function sel(n)robot.select(n)end
 function place()robot.place()end
 function placeU()robot.placeUp()end
@@ -27,6 +28,23 @@ function findItem(targetName)
     local stack = getSlot(slot)
     if stack and stack.label == targetName then
       return slot
+    end
+  end
+  return nil
+end
+-- Find item special edition
+function findItemSpecial(targetName)
+  for slot = 1, inv() do
+    local stack = getSlot(slot)
+    if targetName == "Coke Oven Brick (Block)" then
+      if stack and stack.label == "Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
+        return slot
+      end
+    end
+    if targetName == "Coke Oven Brick (Brick)" then
+      if stack and stack.name == "dreamcraft:item.CokeOvenBrick" then
+        return slot
+      end
     end
   end
   return nil
@@ -74,6 +92,7 @@ function setUpCrafting(name, material)
     swap(1, 1)
     swap(3, 1)
     swap(5, 1)
+    swap(6, 1)
     swap(7, 1)
     swap(10, 1)
     sel(findItem("Hammer"))
@@ -82,6 +101,7 @@ function setUpCrafting(name, material)
 end
 function craft(nam, material, n)
   for i=1,n,1 do
+    clearForCrafting()
     setUpCrafting(nam, material, 1)
     cr.craft(1)
   end
@@ -245,8 +265,6 @@ function buildEBF()
 end
 
 ----- MAIN CODE -----
-clearForCrafting()
 craft("Hammer", "Iron Ingot", 1)
 craft("Wrench", "Iron Ingot", 1)
-
 buildEBF()
