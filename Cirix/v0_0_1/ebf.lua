@@ -44,11 +44,12 @@ end
 
 -- Crafting
 function clearForCrafting()
-  for slot = 1,12,1 do
-    if getSlot(slot) then
+  for slot = 1,12,1
+  do
+    if(getSlot(slot)) then
       sel(slot)
-      for i = 1,inv(),1 do
-        if getSlot(i) == nil then
+      for i = 14,inv() do
+        if(getSlot(i) == nil) then
           swap(i)
           break
         end
