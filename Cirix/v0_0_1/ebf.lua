@@ -16,7 +16,7 @@ function findItem(targetName)
 end
 
 -- Select empty
-function selectEmpty()
+function unequip()
   for slot = 1,robot.inventorySize(),1 do
     if ic.getStackInInternalSlot(slot) == nil then
       robot.select(slot)
@@ -43,6 +43,15 @@ function tr()
 end
 function tl()
   robot.turnLeft()
+end
+function ta()
+  robot.turnAround()
+end
+function getSlot(n)
+  return ic.getStackInInternalSlot(n)
+end
+function inv()
+  return robot.inventorySize()
 end
 
 -- Crafting
@@ -208,7 +217,7 @@ function buildEBF()
   robot.select(findItem("Wrench"))
   ic.equip()
   robot.useDown(1)
-  selectEmpty()
+  unequip()
   ic.equip()
   b()
   d()
@@ -236,7 +245,7 @@ function buildEBF()
   robot.select(findItem("BrainTech Aerospace Advanced Reinforced Duct Tape FAL-84"))
   ic.equip()
   robot.use(2)
-  selectEmpty()
+  unequip()
   ic.equip()
   tl()
   f()
