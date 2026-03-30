@@ -3,11 +3,28 @@ local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
 
+-- Shortened common functions
+function f()robot.forward()end
+function b()robot.back()end
+function u()robot.up()end
+function d()robot.down()end
+function tr()robot.turnRight()end
+function tl()robot.turnLeft()end
+function ta()robot.turnAround()end
+function getSlot(n)return ic.getStackInInternalSlot(n)end
+function inv()return robot.inventorySize()end
+function swap(n)robot.transferTo(n)end
+function sel(n)robot.select(n)end
+function place()robot.place()end
+function placeU()robot.placeUp()end
+function placeD()robot.placeDown()end
+function equip()ic.equip()end
+
 ----- HELPER FUNCTIONS -----
 -- Find item
 function findItem(targetName)
-  for slot = 1, robot.inventorySize() do
-    local stack = ic.getStackInInternalSlot(slot)
+  for slot = 1, inv() do
+    local stack = getSlot(slot)
     if stack and stack.label == targetName then
       return slot
     end
@@ -17,51 +34,22 @@ end
 
 -- Select empty
 function unequip()
-  for slot = 1,robot.inventorySize(),1 do
-    if ic.getStackInInternalSlot(slot) == nil then
-      robot.select(slot)
+  for slot = 1,inv(),1 do
+    if getSlot(slot) == nil then
+      sel(slot)
       break
     end
   end
 end
 
--- Shortened common functions
-function f()
-  robot.forward()
-end
-function b()
-  robot.back()
-end
-function u()
-  robot.up()
-end
-function d()
-  robot.down()
-end
-function tr()
-  robot.turnRight()
-end
-function tl()
-  robot.turnLeft()
-end
-function ta()
-  robot.turnAround()
-end
-function getSlot(n)
-  return ic.getStackInInternalSlot(n)
-end
-function inv()
-  return robot.inventorySize()
-end
-
 -- Crafting
 function clearForCrafting()
   for slot = 1,12,1 do
-    if ic.getStackInInternalSlot(slot) then
-      robot.select(slot)
-      for i = 1,robot.inventorySize(),1 do
-        if ic.getStackInInternalSlot(i) == nil then
-          robot.transferTo(i)
+    if getSlot(slot) then
+      sel(slot)
+      for i = 1,inv(),1 do
+        if getSlot(i) == nil then
+          swap(i)
           break
         end
       end
@@ -70,25 +58,25 @@ function clearForCrafting()
 end
 function setUpCrafting(nam, material, n)
   if(name == "Hammer") then
-    robot.select(findItem(material))
-    robot.transferTo(1, n)
-    robot.transferTo(2, n)
-    robot.transferTo(5, n)
-    robot.transferTo(6, n)
-    robot.transferTo(9, n)
-    robot.transferTo(10, n)
-    robot.select(findItem("Stick"))
-    robot.transferTo(7, n)
+    sel(findItem(material))
+    swap(1, n)
+    swap(2, n)
+    swap(5, n)
+    swap(6, n)
+    swap(9, n)
+    swap(10, n)
+    sel(findItem("Stick"))
+    swap(7, n)
   end
   if(name == "Wrench") then
-    robot.select(findItem(material))
-    robot.transferTo(1, n)
-    robot.transferTo(3, n)
-    robot.transferTo(5, n)
-    robot.transferTo(7, n)
-    robot.transferTo(10, n)
-    robot.select(findItem("Hammer"))
-    robot.transferTo(2, 1)
+    sel(findItem(material))
+    swap(1, n)
+    swap(3, n)
+    swap(5, n)
+    swap(7, n)
+    swap(10, n)
+    sel(findItem("Hammer"))
+    swap(2, 1)
   end
 end
 function craft(nam, material, n)
@@ -102,36 +90,35 @@ function buildEBF()
   f()
   f()
   f()
-  tr()
-  tr()
-  robot.select(findItem("LV Energy Hatch"))
-  robot.place()
+  ta()
+  sel(findItem("LV Energy Hatch"))
+  place()
   tr()
   f()
   tl()
-  robot.place()
-  tl()
-  f()
-  f()
-  tr()
-  robot.select(findItem("Heat Proof Machine Casing"))
-  robot.place()
-  tl()
-  f()
-  tr()
-  f()
-  f()
-  tr()
-  robot.select(findItem("Maintenance Hatch"))
-  robot.place()
+  place()
   tl()
   f()
   f()
   tr()
+  sel(findItem("Heat Proof Machine Casing"))
+  place()
+  tl()
   f()
   tr()
-  robot.select(findItem("Input Hatch (LV)"))
-  robot.place()
+  f()
+  f()
+  tr()
+  sel(findItem("Maintenance Hatch"))
+  place()
+  tl()
+  f()
+  f()
+  tr()
+  f()
+  tr()
+  sel(findItem("Input Hatch (LV)"))
+  place()
   tl()
   f()
   f()
@@ -140,13 +127,13 @@ function buildEBF()
   f()
   f()
   tr()
-  robot.select(findItem("Output Bus (LV)"))
-  robot.place()
+  sel(findItem("Output Bus (LV)"))
+  place()
   tr()
   f()
   tl()
-  robot.select(findItem("Input Bus (LV)"))
-  robot.place()
+  sel(findItem("Input Bus (LV)"))
+  place()
   tr()
   f()
   tl()
@@ -154,13 +141,13 @@ function buildEBF()
   f()
   tl()
   f()
-  robot.select(findItem("Heat Proof Machine Casing"))
-  robot.place()
+  sel(findItem("Heat Proof Machine Casing"))
+  place()
   b()
-  robot.select(findItem("Electric Blast Furnace"))
-  robot.place()
+  sel(findItem("Electric Blast Furnace"))
+  place()
   
-  robot.select(findItem("Cupronickel Coil Block"))
+  sel(findItem("Cupronickel Coil Block"))
   for i = 1,2,1 
   do
     u()
@@ -168,28 +155,25 @@ function buildEBF()
     f()
     f()
     tr()
-    robot.place()
-    tl()
-    tl()
-    robot.place()
+    place()
+    ta()
+    place()
     tr()
     b()
-    robot.place()
+    place()
     tr()
-    robot.place()
-    tl()
-    tl()
-    robot.place()
+    place()
+    ta()
+    place()
     tr()
     b()
     tr()
-    robot.place()
-    tl()
-    tl()
-    robot.place()
+    place()
+    ta()
+    place()
     tr()
     b()
-    robot.place()
+    place()
   end
   
   u()
@@ -197,40 +181,37 @@ function buildEBF()
   f()
   f()
   tr()
-  robot.select(findItem("Heat Proof Machine Casing"))
-  robot.place()
-  tl()
-  tl()
-  robot.place()
+  sel(findItem("Heat Proof Machine Casing"))
+  place()
+  ta()
+  place()
   tr()
   b()
-  robot.place()
+  place()
   tr()
-  robot.place()
-  tl()
-  tl()
-  robot.place()
+  place()
+  ta()
+  place()
   tr()
   u()
-  robot.select(findItem("Muffler Hatch (LV)"))
-  robot.placeDown()
-  robot.select(findItem("Wrench"))
-  ic.equip()
+  sel(findItem("Muffler Hatch (LV)"))
+  placeD()
+  sel(findItem("Wrench"))
+  equip()
   robot.useDown(1)
   unequip()
-  ic.equip()
+  equip()
   b()
   d()
   tr()
-  robot.select(findItem("Heat Proof Machine Casing"))
-  robot.place()
-  tl()
-  tl()
-  robot.place()
+  sel(findItem("Heat Proof Machine Casing"))
+  place()
+  ta()
+  place()
   tr()
   b()
-  robot.select(findItem("Output Hatch (LV)"))
-  robot.place()
+  sel(findItem("Output Hatch (LV)"))
+  place()
   
   d()
   d()
@@ -242,11 +223,11 @@ function buildEBF()
   f()
   f()
   tl()
-  robot.select(findItem("BrainTech Aerospace Advanced Reinforced Duct Tape FAL-84"))
-  ic.equip()
+  sel(findItem("BrainTech Aerospace Advanced Reinforced Duct Tape FAL-84"))
+  equip()
   robot.use(2)
   unequip()
-  ic.equip()
+  equip()
   tl()
   f()
   f()
