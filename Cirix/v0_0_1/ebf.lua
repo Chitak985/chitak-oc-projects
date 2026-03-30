@@ -57,32 +57,34 @@ function clearForCrafting()
     end
   end
 end
-function setUpCrafting(nam, material, n)
+function setUpCrafting(name, material)
   if(name == "Hammer") then
     sel(findItem(material))
-    swap(1, n)
-    swap(2, n)
-    swap(5, n)
-    swap(6, n)
-    swap(9, n)
-    swap(10, n)
+    swap(1, 1)
+    swap(2, 1)
+    swap(5, 1)
+    swap(6, 1)
+    swap(9, 1)
+    swap(10, 1)
     sel(findItem("Stick"))
-    swap(7, n)
+    swap(7, 1)
   end
   if(name == "Wrench") then
     sel(findItem(material))
-    swap(1, n)
-    swap(3, n)
-    swap(5, n)
-    swap(7, n)
-    swap(10, n)
+    swap(1, 1)
+    swap(3, 1)
+    swap(5, 1)
+    swap(7, 1)
+    swap(10, 1)
     sel(findItem("Hammer"))
     swap(2, 1)
   end
 end
 function craft(nam, material, n)
-  setUpCrafting(nam, material, n)
-  cr.craft(n)
+  for i=1,n,1 do
+    setUpCrafting(nam, material, 1)
+    cr.craft(1)
+  end
 end
 
 -- Multis
