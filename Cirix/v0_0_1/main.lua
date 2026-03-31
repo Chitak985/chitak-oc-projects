@@ -46,6 +46,16 @@ function findItemSpecial(targetName)
         return slot
       end
     end
+    if targetName == "Advanced Coke Oven Brick (Block)" then
+      if stack and stack.label == "Advanced Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
+        return slot
+      end
+    end
+    if targetName == "Advanced Coke Oven Brick (Brick)" then
+      if stack and stack.name == "dreamcraft:item.AdvancedCokeOvenBrick" then
+        return slot
+      end
+    end
   end
   return nil
 end
@@ -105,6 +115,59 @@ function craft(nam, material, n)
     setUpCrafting(nam, material, 1)
     cr.craft(1)
   end
+end
+
+-- Construction
+function square3()
+  f()
+  f()
+  f()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  place()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  place()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  place()
+end
+function square3H()
+  f()
+  f()
+  f()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  place()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  place()
 end
 
 -- Multis
@@ -171,33 +234,10 @@ function buildEBF()
   place()
   
   sel(findItem("Cupronickel Coil Block"))
-  for i = 1,2,1 
-  do
-    u()
-    f()
-    f()
-    f()
-    tr()
-    place()
-    ta()
-    place()
-    tr()
-    b()
-    place()
-    tr()
-    place()
-    ta()
-    place()
-    tr()
-    b()
-    tr()
-    place()
-    ta()
-    place()
-    tr()
-    b()
-    place()
-  end
+  u()
+  square3H()
+  u()
+  square3H()
   
   u()
   f()
@@ -257,14 +297,80 @@ function buildEBF()
   tr()
   f()
   f()
+  tr()
+end
+function buildCokeOven()
+  sel(findItemSpecial("Coke Oven Brick (Block)"))
+  square3()
+  u()
+  square3H()
+  u()
+  square3()
+  d()
+  d()
+end
+function buildAdvancedCokeOven()
+  sel(findItemSpecial("Advanced Coke Oven Brick (Block)"))
+  square3()
+  u()
+  square3H()
+  u()
+  square3H()
+  u()
+  square3H()
+  d()
+  d()
+  d()
+end
+
+-- Other
+function moveToNext3_3Side()
+  tl()
   f()
   f()
   f()
   f()
   tr()
 end
+function moveToNext3_3Front()
+  tl()
+  f()
+  f()
+  tr()
+  f()
+  f()
+  f()
+  f()
+  f()
+  tr()
+  f()
+  f()
+  tl()
+end
+function moveToNext3_3Back()
+  tl()
+  f()
+  f()
+  tl()
+  f()
+  f()
+  f()
+  f()
+  f()
+  tl()
+  f()
+  f()
+  tl()
+end
 
 ----- MAIN CODE -----
 craft("Hammer", "Iron Ingot", 1)
 craft("Wrench", "Iron Ingot", 1)
 buildEBF()
+moveToNext3_3Front()
+buildCokeOven()
+moveToNext3_3Front()
+buildAdvancedCokeOven()
+moveToNext3_3Back()
+moveToNext3_3Back()
+moveToNext3_3Side()
