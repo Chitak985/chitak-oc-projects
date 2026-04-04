@@ -320,10 +320,6 @@ function buildEBF() --Using old code because new doesn't work
   tr()
   f()
   f()
-  f()
-  f()
-  f()
-  f()
   tr()
 end
 function buildCokeOven()
