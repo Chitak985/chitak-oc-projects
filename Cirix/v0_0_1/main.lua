@@ -26,35 +26,28 @@ function equip()ic.equip()end
 function findItem(targetName)
   for slot = 1, inv() do
     local stack = getSlot(slot)
-    if stack and stack.label == targetName then
-      return slot
-    end
-  end
-  return nil
-end
--- Find item special edition
-function findItemSpecial(targetName)
-  for slot = 1, inv() do
-    local stack = getSlot(slot)
     if targetName == "Coke Oven Brick (Block)" then
       if stack and stack.label == "Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
         return slot
       end
     end
-    if targetName == "Coke Oven Brick (Brick)" then
+    elseif targetName == "Coke Oven Brick (Brick)" then
       if stack and stack.name == "dreamcraft:item.CokeOvenBrick" then
         return slot
       end
     end
-    if targetName == "Advanced Coke Oven Brick (Block)" then
+    elseif targetName == "Advanced Coke Oven Brick (Block)" then
       if stack and stack.label == "Advanced Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
         return slot
       end
     end
-    if targetName == "Advanced Coke Oven Brick (Brick)" then
+    elseif targetName == "Advanced Coke Oven Brick (Brick)" then
       if stack and stack.name == "dreamcraft:item.AdvancedCokeOvenBrick" then
         return slot
       end
+    end
+    elseif stack and stack.label == targetName then
+      return slot
     end
   end
   return nil
@@ -106,6 +99,22 @@ function setUpCrafting(name, material)
     swap(7, 1)
     swap(10, 1)
     sel(findItem("Hammer"))
+    swap(2, 1)
+  end
+  if(name == "2x2") then
+    sel(findItem(material))
+    swap(1, 1)
+    swap(2, 1)
+    swap(5, 1)
+    swap(6, 1)
+  end
+  if(name == "1x1") then
+    sel(findItem(material))
+    swap(1, 1)
+  end
+  if(name == "1x2") then
+    sel(findItem(material))
+    swap(1, 1)
     swap(2, 1)
   end
 end
@@ -323,7 +332,7 @@ function buildEBF() --Using old code because new doesn't work
   tr()
 end
 function buildCokeOven()
-  sel(findItemSpecial("Coke Oven Brick (Block)"))
+  sel(findItem("Coke Oven Brick (Block)"))
   square3()
   u()
   square3H()
@@ -333,7 +342,7 @@ function buildCokeOven()
   d()
 end
 function buildAdvancedCokeOven()
-  sel(findItemSpecial("Advanced Coke Oven Brick (Block)"))
+  sel(findItem("Advanced Coke Oven Brick (Block)"))
   square3()
   u()
   square3H()
@@ -387,8 +396,27 @@ function moveToNext3_3Back()
 end
 
 ----- MAIN CODE -----
+craft("1x1","Oak Log",2)
+craft("1x2","Oak Planks",2)
 craft("Hammer", "Iron Ingot", 1)
 craft("Wrench", "Iron Ingot", 1)
+craft("2x2","Coke Oven Brick (Brick)",26)
+craft("2x2","Advanced Coke Oven Brick (Brick)",34)
+tr()
+f()
+tl()
+
+f()
+sel(findItem("Basic Solar Panel"))
+place()
+b()
+sel(findItem("Basic Assembling Machine"))
+place()
+
+tr()
+f()
+f()
+tl()
 buildEBF()
 moveToNext3_3Front()
 buildCokeOven()
@@ -396,4 +424,8 @@ moveToNext3_3Front()
 buildAdvancedCokeOven()
 moveToNext3_3Back()
 moveToNext3_3Back()
-moveToNext3_3Side()
+tl()
+f()
+f()
+f()
+tr()
