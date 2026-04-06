@@ -1,6 +1,6 @@
 -- init.lua file for the Cirix Submind, not the actual Cirix itself, use main.lua instead.
 do
-  local addr, invoke = computer.getBootAddress(), computer.invoke
+  local addr, invoke = computer.getBootAddress(), component.invoke
   local function loadfile(file)
     local handle = assert(invoke(addr, "open", file))
     local buffer = ""
