@@ -9,6 +9,13 @@ An OpenComputers robot capable of doing **many** things in GTNH!
 - Get a creative mode robot (Creatix) and rename it to Cirix. Place the robot facing the computer's front (assembler is on the other side from the robot) and activate the robot.
 - Insert the redstone card into the robot's card slot and put a fully charged Vajra into its hand slot (slot with a wrench icon).
 - Install OpenOS on the robot.
+- Give the robot the following items:
+  - 64x BrainTech Aerospace Advanced Reinforced Duct Tape FAL-84
+  - 64x Maintenance Hatch
+  - 1x Basic Solar Panel
+  - 1x Basic Assembling Machine
+  - 64x Iron Ingot
+  - 64x Oak Log
 - Run `wget https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/main.lua && main` inside Cirix.
 - Step away and watch how it eats your world to progress through tiers.
 ## Dev stuff
