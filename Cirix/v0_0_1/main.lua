@@ -30,27 +30,32 @@ function findItem(targetName)
       if stack and stack.label == "Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
         return slot
       end
-    end
     elseif targetName == "Coke Oven Brick (Brick)" then
       if stack and stack.name == "dreamcraft:item.CokeOvenBrick" then
         return slot
       end
-    end
     elseif targetName == "Advanced Coke Oven Brick (Block)" then
       if stack and stack.label == "Advanced Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
         return slot
       end
-    end
     elseif targetName == "Advanced Coke Oven Brick (Brick)" then
       if stack and stack.name == "dreamcraft:item.AdvancedCokeOvenBrick" then
         return slot
       end
-    end
     elseif stack and stack.label == targetName then
       return slot
     end
   end
   return nil
+end
+
+-- Has item
+function hasItem(targetName)
+  if(findItem(targetName)) then
+    return true
+  else
+    return false
+  end
 end
 
 -- Select empty
@@ -177,6 +182,63 @@ function square3H()
   tr()
   b()
   place()
+end
+function square3V()
+  place()
+  u()
+  place()
+  u()
+  place()
+  tr()
+  f()
+  tl()
+  place()
+  d()
+  place()
+  d()
+  place()
+  tl()
+  f()
+  f()
+  tr()
+  place()
+  u()
+  place()
+  u()
+  place()
+  d()
+  d()
+  tr()
+  f()
+  tl()
+end
+function square3HV()
+  place()
+  u()
+  u()
+  place()
+  tr()
+  f()
+  tl()
+  place()
+  d()
+  place()
+  d()
+  place()
+  tl()
+  f()
+  f()
+  tr()
+  place()
+  u()
+  place()
+  u()
+  place()
+  d()
+  d()
+  tr()
+  f()
+  tl()
 end
 
 -- Multis
@@ -354,8 +416,71 @@ function buildAdvancedCokeOven()
   d()
   d()
 end
+function buildSteamGrinder(tier)
+  if(tier == 1) then
+    sel(findItem("Bronze Plated Bricks"))
+  elseif(tier == 2) then
+    sel(findItem("Solid Steel Machine Casing"))
+  end
+  square3()
+  u()
+  f()
+  f()
+  f()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  place()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  sel(findItem("Steam Grinder"))
+  place()
+  u()
+  if(tier == 1) then
+    sel(findItem("Bronze Plated Bricks"))
+  elseif(tier == 2) then
+    sel(findItem("Solid Steel Machine Casing"))
+  end
+  square3()
+  d()
+  d()
+end
+function buildSteamSquasher(tier)
+  if(tier == 1) then
+    sel(findItem("Bronze Plated Bricks"))
+  elseif(tier == 2) then
+    sel(findItem("Solid Steel Machine Casing"))
+  end
+  f()
+  f()
+  f()
+  square3V()
+  b()
+  square3HV()
+  b()
+  square3HV()
+  b()
+  square3HV()
+  u()
+  sel(findItem("Steam Squasher"))
+  place()
+  d()
+end
 
--- Other
+-- Movement
 function moveToNext3_3Side()
   tl()
   f()
@@ -417,11 +542,30 @@ tr()
 f()
 f()
 tl()
-buildEBF()
+if(hasItem("Electric Blast Furnace")) then
+  buildEBF()
+end
 moveToNext3_3Front()
-buildCokeOven()
+if(hasItem("Coke Oven Brick (Brick)")) then
+  buildCokeOven()
+end
 moveToNext3_3Front()
-buildAdvancedCokeOven()
+if(hasItem("Advanced Coke Oven Brick (Brick)")) then
+  buildAdvancedCokeOven()
+end
+moveToNext3_3Front()
+if(hasItem("Solid Steel Machine Casing")) then
+  buildSteamGrinder(2)
+elseif(hasItem("Bronze Plated Bricks")) then
+  buildSteamGrinder(1)
+end
+moveToNext3_3Front()
+if(hasItem("Solid Steel Machine Casing")) then
+  buildSteamSquasher(2)
+elseif(hasItem("Bronze Plated Bricks")) then
+  buildSteamSquasher(1)
+end
+moveToNext3_3Back()
 moveToNext3_3Back()
 moveToNext3_3Back()
 tl()
