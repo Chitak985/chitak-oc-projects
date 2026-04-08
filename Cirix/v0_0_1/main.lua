@@ -105,7 +105,7 @@ function canBuild(name, tier)
     return countItem("Coke Oven Brick (Block)") >= 26
   end
   if(name == "Advanced Coke Oven") then
-    return countItem("Coke Oven Brick (Block)") >= 34
+    return countItem("Advanced Coke Oven Brick (Block)") >= 34
   end
   if(name == "Electric Blast Furnace") then
     return hasItem("Electric Blast Furnace") and hasItem("Maintenance Hatch") and hasItem("Input Bus (LV)") and hasItem("Output Bus (LV)") and hasItem("Input Hatch (LV)") and hasItem("Output Hatch (LV)") and countItem("LV Energy Hatch") >= 2 and countItem("Heat Proof Machine Casing") >= 9 and countItem("Cupronickel Coil Block") >= 16 and hasItem("Muffler Hatch (LV)")
