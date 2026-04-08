@@ -58,6 +58,34 @@ function hasItem(targetName)
   end
 end
 
+-- Count an item
+function countItem(targetName)
+  local count = 0
+  for slot = 1, inv() do
+    local stack = getSlot(slot)
+    if targetName == "Coke Oven Brick (Block)" then
+      if stack and stack.label == "Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
+        count = count + stack.size
+      end
+    elseif targetName == "Coke Oven Brick (Brick)" then
+      if stack and stack.name == "dreamcraft:item.CokeOvenBrick" then
+        count = count + stack.size
+      end
+    elseif targetName == "Advanced Coke Oven Brick (Block)" then
+      if stack and stack.label == "Advanced Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
+        count = count + stack.size
+      end
+    elseif targetName == "Advanced Coke Oven Brick (Brick)" then
+      if stack and stack.name == "dreamcraft:item.AdvancedCokeOvenBrick" then
+        count = count + stack.size
+      end
+    elseif stack and stack.label == targetName then
+      count = count + stack.size
+    end
+  end
+  return count
+end
+
 -- Select empty
 function unequip()
   for slot = 1,inv(),1 do
