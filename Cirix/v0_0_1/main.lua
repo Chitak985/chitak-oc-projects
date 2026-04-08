@@ -113,14 +113,14 @@ function canBuild(name, tier)
   if(name == "Steam Grinder") then
     if(tier == 1) then
       return hasItem("Steam Grinder") and countItem("Bronze Plated Bricks") >= 25
-    else then
+    else
       return hasItem("Steam Grinder") and countItem("Solid Steel Machine Casing") >= 25
     end
   end
   if(name == "Steam Squasher") then
     if(tier == 1) then
       return hasItem("Steam Squasher") and countItem("Bronze Plated Bricks") >= 33
-    else then
+    else
       return hasItem("Steam Squasher") and countItem("Solid Steel Machine Casing") >= 33
     end
   end
