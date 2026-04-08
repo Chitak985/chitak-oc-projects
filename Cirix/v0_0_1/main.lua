@@ -19,6 +19,9 @@ function sel(n)robot.select(n)end
 function place()robot.place()end
 function placeU()robot.placeUp()end
 function placeD()robot.placeDown()end
+function swing()robot.swing()end
+function swingU()robot.swingUp()end
+function swingD()robot.swingDown()end
 function equip()ic.equip()end
 
 ----- HELPER FUNCTIONS -----
@@ -96,6 +99,84 @@ function unequip()
   end
 end
 
+-- Can build multi
+function canBuild(name, tier)
+  if(name == "Coke Oven") then
+    return countItem("Coke Oven Brick (Block)") >= 26
+  end
+  if(name == "Advanced Coke Oven") then
+    return countItem("Coke Oven Brick (Block)") >= 34
+  end
+  if(name == "Electric Blast Furnace") then
+    return hasItem("Electric Blast Furnace") and hasItem("Maintenance Hatch") and hasItem("Input Bus (LV)") and hasItem("Output Bus (LV)") and hasItem("Input Hatch (LV)") and hasItem("Output Hatch (LV)") and countItem("LV Energy Hatch") >= 2 and countItem("Heat Proof Machine Casing") >= 9 and countItem("Cupronickel Coil Block") >= 16 and hasItem("Muffler Hatch (LV)")
+  end
+  if(name == "Steam Grinder") then
+    if(tier == 1) then
+      return hasItem("Steam Grinder") and countItem("Bronze Plated Bricks") >= 25
+    else then
+      return hasItem("Steam Grinder") and countItem("Solid Steel Machine Casing") >= 25
+    end
+  end
+  if(name == "Steam Squasher") then
+    if(tier == 1) then
+      return hasItem("Steam Squasher") and countItem("Bronze Plated Bricks") >= 33
+    else then
+      return hasItem("Steam Squasher") and countItem("Solid Steel Machine Casing") >= 33
+    end
+  end
+end
+
+-- Singleblock setup
+function setupMachine(machine, tier)
+  if(machine == "Compressor") then
+    if(tier == "LV" or tier == "ULV") then
+      f()
+      sel(findItem("Dirt"))
+      place()
+      b()
+      sel(findItem("Hopper"))
+      place()
+      u()
+      f()
+      sel(findItem("Basic Solar Panel"))
+      place()
+      b()
+      sel(findItem("Basic Compressor"))
+      place()
+      tr()
+      f()
+      tl()
+      sel(findItem("Hopper"))
+      place()
+      tl()
+      f()
+      tr()
+      d()
+    end
+  end
+end
+
+-- Singleblock dismantle
+function dismantleMachine(machine)
+  if(machine == "Compressor") then
+    sel(findItem("Vajra"))
+    equip()
+    u()
+    swing()
+    f()
+    swingD()
+    swing()
+    tr()
+    swing()
+    tl()
+    f()
+    swingD()
+    d()
+    b()
+    b()
+  end
+end
+
 -- Crafting
 function clearForCrafting()
   for slot = 1,12,1
@@ -157,6 +238,29 @@ function craft(nam, material, n)
     setUpCrafting(nam, material, 1)
     cr.craft(1)
   end
+end
+
+-- Compressing
+function compress(nam, n)
+  setupMachine("Compressor", "ULV")
+  for i=1,n,1 do
+    if(nam == "Advanced Coke Oven Brick (Block)") then
+      u()
+      tr()
+      f()
+      tl()
+      sel(findItem("Advanced Coke Oven Brick (Brick)"))
+      robot.drop(4)
+      tl()
+      f()
+      tr()
+      d()
+      while not robot.suck() do
+
+      end
+    end
+  end
+  dismantleMachine("Compressor")
 end
 
 -- Construction
@@ -551,46 +655,46 @@ end
 ----- MAIN CODE -----
 craft("1x1","Oak Log",2)
 craft("1x2","Oak Planks",2)
-craft("Hammer", "Iron Ingot", 1)
-craft("Wrench", "Iron Ingot", 1)
-craft("2x2","Coke Oven Brick (Brick)",26)
-craft("2x2","Advanced Coke Oven Brick (Brick)",34)
-tr()
-f()
-tl()
-
-f()
-sel(findItem("Basic Solar Panel"))
-place()
-b()
-sel(findItem("Basic Assembling Machine"))
-place()
-
+if(not hasItem("Hammer")) then
+  craft("Hammer", "Iron Ingot", 1)
+end
+if(not hasItem("Wrench")) then
+  craft("Wrench", "Iron Ingot", 1)
+end
+if(countItem("Coke Oven Brick (Block)") < 26) then
+  craft("2x2","Coke Oven Brick (Brick)",26)
+end
+if(countItem("Advanced Coke Oven Brick (Block)") < 34) then
+  compress("Advanced Coke Oven Brick (Block)",34)
+end
 tr()
 f()
 f()
+f()
+f()
+f()
 tl()
-if(hasItem("Electric Blast Furnace")) then
+if(canBuild("Electric Blast Furnace")) then
   buildEBF()
 end
 moveToNext3_3Front()
-if(hasItem("Coke Oven Brick (Brick)")) then
+if(canBuild("Coke Oven")) then
   buildCokeOven()
 end
 moveToNext3_3Front()
-if(hasItem("Advanced Coke Oven Brick (Brick)")) then
+if(canBuild("Advanced Coke Oven")) then
   buildAdvancedCokeOven()
 end
 moveToNext3_3Front()
-if(hasItem("Solid Steel Machine Casing")) then
+if(canBuild("Steam Grinder", 2)) then
   buildSteamGrinder(2)
-elseif(hasItem("Bronze Plated Bricks")) then
+elseif(canBuild("Steam Grinder", 1)) then
   buildSteamGrinder(1)
 end
 moveToNext3_3Front()
-if(hasItem("Solid Steel Machine Casing")) then
+if(canBuild("Steam Squasher", 2)) then
   buildSteamSquasher(2)
-elseif(hasItem("Bronze Plated Bricks")) then
+elseif(canBuild("Steam Squasher", 1)) then
   buildSteamSquasher(1)
 end
 moveToNext3_3Back()
