@@ -1,10 +1,12 @@
 -- wget https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/main.lua && main
+-- TODO: Replace sel(findItem("e")) to avoid findItem returning nil and breaking everything
 local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
 
--- Shortened common functions
+----- SHORTENED FUNCTIONS -----
+-- TODO: Add failsafes to movement and other functions
 function f()robot.forward()end
 function b()robot.back()end
 function u()robot.up()end
@@ -14,7 +16,7 @@ function tl()robot.turnLeft()end
 function ta()robot.turnAround()end
 function getSlot(n)return ic.getStackInInternalSlot(n)end
 function inv()return robot.inventorySize()end
-function swap(n,n2)robot.transferTo(n,n2)end
+function swapTo(n,n2)robot.transferTo(n,n2)end
 function sel(n)robot.select(n)end
 function place()robot.place()end
 function placeU()robot.placeUp()end
@@ -24,28 +26,90 @@ function swingU()robot.swingUp()end
 function swingD()robot.swingDown()end
 function equip()ic.equip()end
 
------ HELPER FUNCTIONS -----
+----- DATA -----
+-- Special items (mutiple items with the same display name)
+local itemMap = {
+  ["Coke Oven Brick (Block)"] = {
+    {label="Coke Oven Brick", name="Railcraft:machine.alpha"}
+  },
+  ["Coke Oven Brick (Brick)"] = {
+    {name="dreamcraft:item.CokeOvenBrick"}
+  },
+  ["Advanced Coke Oven Brick (Block)"] = {
+    {label="Advanced Coke Oven Brick", name="Railcraft:machine.alpha"}
+  },
+  ["Advanced Coke Oven Brick (Brick)"] = {
+    {name="dreamcraft:item.AdvancedCokeOvenBrick"}
+  }
+}
+-- Multiblock construction requirements (mostly used by canBuild())
+-- Multiblock names are formatted as "name|tier"
+local multiblocks = {
+  ["Coke Oven"] = {
+    {"Coke Oven Brick (Block)", 26}
+  },
+  ["Advanced Coke Oven"] = {
+    {"Advanced Coke Oven Brick (Block)", 34}
+  },
+  ["Electric Blast Furnace"] = {
+    {"Electric Blast Furnace", 1},
+    {"Maintenance Hatch", 1},
+    {"Input Bus (LV)", 1},
+    {"Output Bus (LV)", 1},
+    {"Input Hatch (LV)", 1},
+    {"Output Hatch (LV)", 1},
+    {"LV Energy Hatch", 2},
+    {"Heat Proof Machine Casing", 9},
+    {"Cupronickel Coil Block", 16},
+    {"Muffler Hatch (LV)", 1}
+  },
+  ["Steam Grinder|1"] = {
+    {"Steam Grinder", 1},
+    {"Bronze Plated Bricks", 25}
+  },
+  ["Steam Grinder|2"] = {
+    {"Steam Grinder", 1},
+    {"Solid Steel Machine Casing", 25}
+  },
+  ["Steam Squasher|1"] = {
+    {"Steam Squasher", 1},
+    {"Bronze Plated Bricks", 33}
+  },
+  ["Steam Squasher|2"] = {
+    {"Steam Squasher", 1},
+    {"Solid Steel Machine Casing", 33}
+  }
+}
+
+----- HELPER ITEM OPERATIONS -----
+-- Matching
+function matches(stack, targetName)
+  if not stack then return false end
+
+  local defs = itemMap[targetName]
+
+  -- If special definition exists, use it
+  if defs then
+    for _, def in ipairs(defs) do
+      local labelMatch = (not def.label) or (stack.label == def.label)
+      local nameMatch  = (not def.name)  or (stack.name  == def.name)
+
+      if labelMatch and nameMatch then
+        return true
+      end
+    end
+    return false
+  end
+
+  -- Default behavior: match by display name
+  return stack.label == targetName
+end
+
 -- Find item
 function findItem(targetName)
-  for slot = 1, inv() do
-    local stack = getSlot(slot)
-    if targetName == "Coke Oven Brick (Block)" then
-      if stack and stack.label == "Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
-        return slot
-      end
-    elseif targetName == "Coke Oven Brick (Brick)" then
-      if stack and stack.name == "dreamcraft:item.CokeOvenBrick" then
-        return slot
-      end
-    elseif targetName == "Advanced Coke Oven Brick (Block)" then
-      if stack and stack.label == "Advanced Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
-        return slot
-      end
-    elseif targetName == "Advanced Coke Oven Brick (Brick)" then
-      if stack and stack.name == "dreamcraft:item.AdvancedCokeOvenBrick" then
-        return slot
-      end
-    elseif stack and stack.label == targetName then
+  local size = inv()
+  for slot = 1, size do
+    if matches(getSlot(slot), targetName) then
       return slot
     end
   end
@@ -54,41 +118,25 @@ end
 
 -- Has item
 function hasItem(targetName)
-  if(findItem(targetName)) then
-    return true
-  else
-    return false
-  end
+  return findItem(targetName) ~= nil
 end
 
 -- Count an item
 function countItem(targetName)
   local count = 0
-  for slot = 1, inv() do
+  local size = inv()
+
+  for slot = 1, size do
     local stack = getSlot(slot)
-    if targetName == "Coke Oven Brick (Block)" then
-      if stack and stack.label == "Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
-        count = count + stack.size
-      end
-    elseif targetName == "Coke Oven Brick (Brick)" then
-      if stack and stack.name == "dreamcraft:item.CokeOvenBrick" then
-        count = count + stack.size
-      end
-    elseif targetName == "Advanced Coke Oven Brick (Block)" then
-      if stack and stack.label == "Advanced Coke Oven Brick" and stack.name == "Railcraft:machine.alpha" then
-        count = count + stack.size
-      end
-    elseif targetName == "Advanced Coke Oven Brick (Brick)" then
-      if stack and stack.name == "dreamcraft:item.AdvancedCokeOvenBrick" then
-        count = count + stack.size
-      end
-    elseif stack and stack.label == targetName then
+    if matches(stack, targetName) then
       count = count + stack.size
     end
   end
+
   return count
 end
 
+----- HELPER FUNCTIONS -----
 -- Select empty
 function unequip()
   for slot = 1,inv(),1 do
@@ -97,33 +145,26 @@ function unequip()
       break
     end
   end
+  -- TODO: Failsafe if no slots left
 end
 
 -- Can build multi
 function canBuild(name, tier)
-  if(name == "Coke Oven") then
-    return countItem("Coke Oven Brick (Block)") >= 26
+  -- Handle tiered multis
+  if(tier) then
+    tmp = name .. "|" .. tostring(tier)
+  else
+    tmp = name
   end
-  if(name == "Advanced Coke Oven") then
-    return countItem("Advanced Coke Oven Brick (Block)") >= 34
-  end
-  if(name == "Electric Blast Furnace") then
-    return hasItem("Electric Blast Furnace") and hasItem("Maintenance Hatch") and hasItem("Input Bus (LV)") and hasItem("Output Bus (LV)") and hasItem("Input Hatch (LV)") and hasItem("Output Hatch (LV)") and countItem("LV Energy Hatch") >= 2 and countItem("Heat Proof Machine Casing") >= 9 and countItem("Cupronickel Coil Block") >= 16 and hasItem("Muffler Hatch (LV)")
-  end
-  if(name == "Steam Grinder") then
-    if(tier == 1) then
-      return hasItem("Steam Grinder") and countItem("Bronze Plated Bricks") >= 25
-    else
-      return hasItem("Steam Grinder") and countItem("Solid Steel Machine Casing") >= 25
+  -- Find the multi in data
+  for _, req in ipairs(multiblocks[tmp]) do
+    local item, count = req[1], req[2]
+    if countItem(item) < count then
+      return false
     end
   end
-  if(name == "Steam Squasher") then
-    if(tier == 1) then
-      return hasItem("Steam Squasher") and countItem("Bronze Plated Bricks") >= 33
-    else
-      return hasItem("Steam Squasher") and countItem("Solid Steel Machine Casing") >= 33
-    end
-  end
+  -- Can build if nothing stopped the function
+  return true
 end
 
 -- Singleblock setup
@@ -183,9 +224,10 @@ function clearForCrafting()
   do
     if(getSlot(slot)) then
       sel(slot)
-      for i = 14,inv() do
+      local size = inv()  -- Optimization... somehow
+      for i = 14,size do
         if(getSlot(i) == nil) then
-          swap(i)
+          swapTo(i)
           break
         end
       end
@@ -193,43 +235,44 @@ function clearForCrafting()
   end
 end
 function setUpCrafting(name, material)
+  -- TODO: Use tables for crafting layouts
   if(name == "Hammer") then
     sel(findItem(material))
-    swap(1, 1)
-    swap(2, 1)
-    swap(5, 1)
-    swap(6, 1)
-    swap(9, 1)
-    swap(10, 1)
+    swapTo(1, 1)
+    swapTo(2, 1)
+    swapTo(5, 1)
+    swapTo(6, 1)
+    swapTo(9, 1)
+    swapTo(10, 1)
     sel(findItem("Stick"))
-    swap(7, 1)
+    swapTo(7, 1)
   end
   if(name == "Wrench") then
     sel(findItem(material))
-    swap(1, 1)
-    swap(3, 1)
-    swap(5, 1)
-    swap(6, 1)
-    swap(7, 1)
-    swap(10, 1)
+    swapTo(1, 1)
+    swapTo(3, 1)
+    swapTo(5, 1)
+    swapTo(6, 1)
+    swapTo(7, 1)
+    swapTo(10, 1)
     sel(findItem("Hammer"))
-    swap(2, 1)
+    swapTo(2, 1)
   end
   if(name == "2x2") then
     sel(findItem(material))
-    swap(1, 1)
-    swap(2, 1)
-    swap(5, 1)
-    swap(6, 1)
+    swapTo(1, 1)
+    swapTo(2, 1)
+    swapTo(5, 1)
+    swapTo(6, 1)
   end
   if(name == "1x1") then
     sel(findItem(material))
-    swap(1, 1)
+    swapTo(1, 1)
   end
   if(name == "1x2") then
     sel(findItem(material))
-    swap(1, 1)
-    swap(2, 1)
+    swapTo(1, 1)
+    swapTo(2, 1)
   end
 end
 function craft(nam, material, n)
@@ -255,8 +298,8 @@ function compress(nam, n)
       f()
       tr()
       d()
+      -- TODO: softlock alert, moar failsafes
       while not robot.suck() do
-
       end
     end
   end
