@@ -695,56 +695,87 @@ function moveToNext3_3Back()
   tl()
 end
 
+----- IDK -----
+function ovens()
+  for i = 1,24,1 do
+    for i2 = 1,24,1 do
+      buildCokeOven()
+      moveToNext3_3Front()
+    end
+    for i2 = 1,24,1 do
+      moveToNext3_3Back()
+    end
+    tr()
+    f()
+    f()
+    f()
+    f()
+    tl()
+  end
+  for i = 1,24,1 do
+    tl()
+    f()
+    f()
+    f()
+    f()
+    tr()
+  end
+end
+
 ----- MAIN CODE -----
-craft("1x1","Oak Log",2)
-craft("1x2","Oak Planks",2)
-if(not hasItem("Hammer")) then
-  craft("Hammer", "Iron Ingot", 1)
+if(hasItem("Dimensionally Transcendent Plasma Forge")) then
+  ovens()
+else
+  craft("1x1","Oak Log",2)
+  craft("1x2","Oak Planks",2)
+  if(not hasItem("Hammer")) then
+    craft("Hammer", "Iron Ingot", 1)
+  end
+  if(not hasItem("Wrench")) then
+    craft("Wrench", "Iron Ingot", 1)
+  end
+  if(countItem("Coke Oven Brick (Block)") < 26) then
+    craft("2x2","Coke Oven Brick (Brick)",26)
+  end
+  if(countItem("Advanced Coke Oven Brick (Block)") < 34) then
+    compress("Advanced Coke Oven Brick (Block)",34)
+  end
+  tr()
+  f()
+  f()
+  f()
+  f()
+  f()
+  tl()
+  if(canBuild("Electric Blast Furnace")) then
+    buildEBF()
+  end
+  moveToNext3_3Front()
+  if(canBuild("Coke Oven")) then
+    buildCokeOven()
+  end
+  moveToNext3_3Front()
+  if(canBuild("Advanced Coke Oven")) then
+    buildAdvancedCokeOven()
+  end
+  moveToNext3_3Front()
+  if(canBuild("Steam Grinder", 2)) then
+    buildSteamGrinder(2)
+  elseif(canBuild("Steam Grinder", 1)) then
+    buildSteamGrinder(1)
+  end
+  moveToNext3_3Front()
+  if(canBuild("Steam Squasher", 2)) then
+    buildSteamSquasher(2)
+  elseif(canBuild("Steam Squasher", 1)) then
+    buildSteamSquasher(1)
+  end
+  moveToNext3_3Back()
+  moveToNext3_3Back()
+  moveToNext3_3Back()
+  tl()
+  f()
+  f()
+  f()
+  tr()
 end
-if(not hasItem("Wrench")) then
-  craft("Wrench", "Iron Ingot", 1)
-end
-if(countItem("Coke Oven Brick (Block)") < 26) then
-  craft("2x2","Coke Oven Brick (Brick)",26)
-end
-if(countItem("Advanced Coke Oven Brick (Block)") < 34) then
-  compress("Advanced Coke Oven Brick (Block)",34)
-end
-tr()
-f()
-f()
-f()
-f()
-f()
-tl()
-if(canBuild("Electric Blast Furnace")) then
-  buildEBF()
-end
-moveToNext3_3Front()
-if(canBuild("Coke Oven")) then
-  buildCokeOven()
-end
-moveToNext3_3Front()
-if(canBuild("Advanced Coke Oven")) then
-  buildAdvancedCokeOven()
-end
-moveToNext3_3Front()
-if(canBuild("Steam Grinder", 2)) then
-  buildSteamGrinder(2)
-elseif(canBuild("Steam Grinder", 1)) then
-  buildSteamGrinder(1)
-end
-moveToNext3_3Front()
-if(canBuild("Steam Squasher", 2)) then
-  buildSteamSquasher(2)
-elseif(canBuild("Steam Squasher", 1)) then
-  buildSteamSquasher(1)
-end
-moveToNext3_3Back()
-moveToNext3_3Back()
-moveToNext3_3Back()
-tl()
-f()
-f()
-f()
-tr()
