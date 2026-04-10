@@ -4,6 +4,35 @@ local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
+local invSize = robot.inventorySize()
+
+----- CACHED INVENTORY -----
+-- Data
+local inventoryCache = {}
+local selectedSlot = 1
+local equipped = nil
+-- Cache inventory
+function refreshInventory()
+  inventoryCache = {}
+  for slot = 1, invSize do
+    inventoryCache[slot] = ic.getStackInInternalSlot(slot) -- can be nil or stack table
+  end
+end
+-- Fuction overrides
+function sel(n)
+  robot.select(n)
+  selectedSlot = n
+end
+function equip()
+  local stack = inventoryCache[selectedSlot]
+  ic.equip()
+  inventoryCache[selectedSlot], equipped = equipped, stack
+end
+function swapTo(toSlot, amount)
+  local e = robot.transferTo(toSlot, amount)
+  refreshInventory()  -- I'm too scared to do the full version
+  return e
+end
 
 ----- SHORTENED FUNCTIONS -----
 -- TODO: Add failsafes to movement and other functions
@@ -14,17 +43,16 @@ function d()robot.down()end
 function tr()robot.turnRight()end
 function tl()robot.turnLeft()end
 function ta()robot.turnAround()end
-function getSlot(n)return ic.getStackInInternalSlot(n)end
-function inv()return robot.inventorySize()end
-function swapTo(n,n2)robot.transferTo(n,n2)end
-function sel(n)robot.select(n)end
+function getSlot(n)return inventoryCache[n]end  --function getSlot(n)return ic.getStackInInternalSlot(n)end
+--function swapTo(n,n2)robot.transferTo(n,n2)end  OVERRIDEN IN INVENTORY CACHING
+--function sel(n)robot.select(n)end  OVERRIDEN IN INVENTORY CACHING
 function place()robot.place()end
 function placeU()robot.placeUp()end
 function placeD()robot.placeDown()end
 function swing()robot.swing()end
 function swingU()robot.swingUp()end
 function swingD()robot.swingDown()end
-function equip()ic.equip()end
+--function equip()ic.equip()end  OVERRIDEN IN INVENTORY CACHING
 
 ----- DATA -----
 -- Special items (mutiple items with the same display name)
@@ -107,9 +135,8 @@ end
 
 -- Find item
 function findItem(targetName)
-  local size = inv()
-  for slot = 1, size do
-    if matches(getSlot(slot), targetName) then
+  for slot = 1, invSize do
+    if matches(inventoryCache[slot], targetName) then
       return slot
     end
   end
@@ -124,10 +151,9 @@ end
 -- Count an item
 function countItem(targetName)
   local count = 0
-  local size = inv()
 
-  for slot = 1, size do
-    local stack = getSlot(slot)
+  for slot = 1, invSize do
+    local stack = inventoryCache[slot]
     if matches(stack, targetName) then
       count = count + stack.size
     end
@@ -139,7 +165,7 @@ end
 ----- HELPER FUNCTIONS -----
 -- Select empty
 function unequip()
-  for slot = 1,inv(),1 do
+  for slot = 1,invSize,1 do
     if getSlot(slot) == nil then
       sel(slot)
       break
@@ -224,8 +250,7 @@ function clearForCrafting()
   do
     if(getSlot(slot)) then
       sel(slot)
-      local size = inv()  -- Optimization... somehow
-      for i = 14,size do
+      for i = 14,invSize do
         if(getSlot(i) == nil) then
           swapTo(i)
           break
@@ -280,6 +305,7 @@ function craft(nam, material, n)
     clearForCrafting()
     setUpCrafting(nam, material, 1)
     cr.craft(1)
+    refreshInventory()
   end
 end
 
@@ -301,6 +327,7 @@ function compress(nam, n)
       -- TODO: softlock alert, moar failsafes
       while not robot.suck() do
       end
+      refreshInventory()
     end
   end
   dismantleMachine("Compressor")
