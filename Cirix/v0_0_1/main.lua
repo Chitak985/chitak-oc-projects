@@ -23,10 +23,11 @@ function sel(n)
   robot.select(n)
   selectedSlot = n
 end
-function equip()
+function equip(selectedSlot)
   local stack = inventoryCache[selectedSlot]
-  ic.equip()
-  inventoryCache[selectedSlot], equipped = equipped, stack
+  if ic.equip() then
+    inventoryCache[selectedSlot], equipped = equipped, stack
+  end
 end
 function swapTo(toSlot, amount)
   local e = robot.transferTo(toSlot, amount)
@@ -154,8 +155,10 @@ function countItem(targetName)
 
   for slot = 1, invSize do
     local stack = inventoryCache[slot]
-    if matches(stack, targetName) then
-      count = count + stack.size
+    if stack then
+      if matches(stack, targetName) then
+        count = count + stack.size
+      end
     end
   end
 
@@ -178,11 +181,12 @@ end
 function canBuild(name, tier)
   -- Handle tiered multis
   if(tier) then
-    tmp = name .. "|" .. tostring(tier)
+    local tmp = name .. "|" .. tostring(tier)
   else
-    tmp = name
+    local tmp = name
   end
   -- Find the multi in data
+  -- IGNORE: The multiblock is always there since I call the fucntion myself
   for _, req in ipairs(multiblocks[tmp]) do
     local item, count = req[1], req[2]
     if countItem(item) < count then
@@ -750,6 +754,7 @@ function ovens()
 end
 
 ----- MAIN CODE -----
+refreshInventory()
 if(hasItem("Dimensionally Transcendent Plasma Forge")) then
   ovens()
 else
