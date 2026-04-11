@@ -333,24 +333,29 @@ end
 -- Compressing
 function compress(nam, n)
   setupMachine("Compressor", "ULV")
-  for i=1,n,1 do
-    if(nam == "Advanced Coke Oven Brick (Block)") then
-      u()
-      tr()
-      f()
-      tl()
-      sel(findItem("Advanced Coke Oven Brick (Brick)"))
-      robot.drop(4)
-      tl()
-      f()
-      tr()
-      d()
-      -- TODO: softlock alert, moar failsafes
-      refreshInventory()  -- I feel so not sigma
-      while not robot.suck() do
+  if(nam == "Advanced Coke Oven Brick (Block)") then
+    u()
+    tr()
+    f()
+    tl()
+    sel(findItem("Advanced Coke Oven Brick (Brick)"))
+    robot.drop(4*n)
+    tl()
+    f()
+    tr()
+    d()
+    -- TODO: softlock alert, moar failsafes
+    sel(findItem("Vajra"))
+    equip()
+    sel(findItem("Hopper"))
+    while true do
+      robot.swing()
+      robot.place()
+      if(countItem("Advanced Coke Oven Brick (Block)") >= n) then
+        break
       end
-      refreshInventory()
     end
+    refreshInventory()
   end
   dismantleMachine("Compressor")
 end
