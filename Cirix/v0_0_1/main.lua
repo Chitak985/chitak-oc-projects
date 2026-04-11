@@ -47,12 +47,12 @@ function ta()robot.turnAround()end
 function getSlot(n)return inventoryCache[n]end  --function getSlot(n)return ic.getStackInInternalSlot(n)end
 --function swapTo(n,n2)robot.transferTo(n,n2)end  OVERRIDEN IN INVENTORY CACHING
 --function sel(n)robot.select(n)end  OVERRIDEN IN INVENTORY CACHING
-function place()robot.place()end
-function placeU()robot.placeUp()end
-function placeD()robot.placeDown()end
-function swing()robot.swing()end
-function swingU()robot.swingUp()end
-function swingD()robot.swingDown()end
+function place() robot.place() refreshInventory() end
+function placeU() robot.placeUp() refreshInventory() end
+function placeD() robot.placeDown() refreshInventory() end
+function swing() robot.swing() refreshInventory() end
+function swingU() robot.swingUp() refreshInventory() end
+function swingD() robot.swingDown() refreshInventory() end
 --function equip()ic.equip()end  OVERRIDEN IN INVENTORY CACHING
 
 ----- DATA -----
@@ -323,7 +323,12 @@ function compress(nam, n)
       tr()
       d()
       -- TODO: softlock alert, moar failsafes
+      sel(findItem("Vajra"))
+      equip()
       while not robot.suck() do
+        robot.swing()
+        sel(findItem("Hopper"))
+        place()
       end
       refreshInventory()
     end
