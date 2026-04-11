@@ -178,16 +178,10 @@ function unequip()
 end
 
 -- Can build multi
-function canBuild(name, tier)
-  -- Handle tiered multis
-  if(tier) then
-    local tmp = name .. "|" .. tostring(tier)
-  else
-    local tmp = name
-  end
+function canBuild(name)
   -- Find the multi in data
   -- IGNORE: The multiblock is always there since I call the fucntion myself
-  for _, req in ipairs(multiblocks[tmp]) do
+  for _, req in ipairs(multiblocks[name]) do
     local item, count = req[1], req[2]
     if countItem(item) < count then
       return false
@@ -791,15 +785,15 @@ else
     buildAdvancedCokeOven()
   end
   moveToNext3_3Front()
-  if(canBuild("Steam Grinder", 2)) then
+  if(canBuild("Steam Grinder|2")) then
     buildSteamGrinder(2)
-  elseif(canBuild("Steam Grinder", 1)) then
+  elseif(canBuild("Steam Grinder|2")) then
     buildSteamGrinder(1)
   end
   moveToNext3_3Front()
-  if(canBuild("Steam Squasher", 2)) then
+  if(canBuild("Steam Squasher|2")) then
     buildSteamSquasher(2)
-  elseif(canBuild("Steam Squasher", 1)) then
+  elseif(canBuild("Steam Squasher|1")) then
     buildSteamSquasher(1)
   end
   moveToNext3_3Back()
