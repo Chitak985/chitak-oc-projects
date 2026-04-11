@@ -347,12 +347,7 @@ function compress(nam, n)
       d()
       -- TODO: softlock alert, moar failsafes
       refreshInventory()  -- I feel so not sigma
-      sel(findItem("Vajra"))
-      equip()
-      sel(findItem("Hopper"))  -- Save time
       while not robot.suck() do
-        robot.swing()
-        place()
       end
       refreshInventory()
     end
