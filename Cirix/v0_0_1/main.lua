@@ -23,7 +23,7 @@ function sel(n)
   robot.select(n)
   selectedSlot = n
 end
-function equip(selectedSlot)
+function equip()
   local stack = inventoryCache[selectedSlot]
   if ic.equip() then
     inventoryCache[selectedSlot], equipped = equipped, stack
