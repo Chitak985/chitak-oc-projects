@@ -34,6 +34,29 @@ function swapTo(toSlot, amount)
   refreshInventory()  -- I'm too scared to do the full version
   return e
 end
+function placeCheck(success)
+  if not success then return false end  -- FAILSAFE: if place fails then don't do anything
+
+  local stack = inventoryCache[selectedSlot]
+  if not stack then return true end -- FAILSAFE: shouldn't happen anyway
+
+  stack.size = stack.size - 1
+
+  if stack.size < 1 then
+    inventoryCache[selectedSlot] = nil
+  end
+
+  return true
+end
+function place()
+  return placeCheck(robot.place())
+end
+function placeU()
+  return placeCheck(robot.placeUp())
+end
+function placeD()
+  return placeCheck(robot.placeDown())
+end
 
 ----- SHORTENED FUNCTIONS -----
 -- TODO: Add failsafes to movement and other functions
@@ -47,9 +70,9 @@ function ta()robot.turnAround()end
 function getSlot(n)return inventoryCache[n]end  --function getSlot(n)return ic.getStackInInternalSlot(n)end
 --function swapTo(n,n2)robot.transferTo(n,n2)end  OVERRIDEN IN INVENTORY CACHING
 --function sel(n)robot.select(n)end  OVERRIDEN IN INVENTORY CACHING
-function place() robot.place() refreshInventory() end
-function placeU() robot.placeUp() refreshInventory() end
-function placeD() robot.placeDown() refreshInventory() end
+--function place() robot.place() end  OVERRIDEN IN INVENTORY CACHING
+--function placeU() robot.placeUp() end  OVERRIDEN IN INVENTORY CACHING
+--function placeD() robot.placeDown() end  OVERRIDEN IN INVENTORY CACHING
 function swing() robot.swing() refreshInventory() end
 function swingU() robot.swingUp() refreshInventory() end
 function swingD() robot.swingDown() refreshInventory() end
@@ -323,11 +346,12 @@ function compress(nam, n)
       tr()
       d()
       -- TODO: softlock alert, moar failsafes
+      refreshInventory()  -- I feel so not sigma
       sel(findItem("Vajra"))
       equip()
+      sel(findItem("Hopper"))  -- Save time
       while not robot.suck() do
         robot.swing()
-        sel(findItem("Hopper"))
         place()
       end
       refreshInventory()
