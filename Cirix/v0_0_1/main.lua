@@ -338,8 +338,10 @@ function compress(nam, n)
     tr()
     f()
     tl()
-    sel(findItem("Advanced Coke Oven Brick (Brick)"))
-    robot.drop(4*n)
+    for i=1,4*n do
+      sel(findItem("Advanced Coke Oven Brick (Brick)"))
+      robot.drop(1)
+    end
     tl()
     f()
     tr()
