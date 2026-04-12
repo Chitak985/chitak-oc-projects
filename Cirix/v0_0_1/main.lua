@@ -353,8 +353,12 @@ function compress(nam, n)
     while true do
       robot.swing()
       robot.place()
-      if(countItem("Advanced Coke Oven Brick (Block)") >= n) then
-        break
+      checks = checks + 1
+      if checks % 10 == 0 then  -- refresh every 10 cycles
+        refreshInventory()
+        if(countItem("Advanced Coke Oven Brick (Block)") >= n) then
+          break
+        end
       end
     end
     refreshInventory()
