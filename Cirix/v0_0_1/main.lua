@@ -117,19 +117,31 @@ local multiblocks = {
   },
   ["Steam Grinder|1"] = {
     {"Steam Grinder", 1},
-    {"Bronze Plated Bricks", 25}
+    {"Bronze Plated Bricks", 22},
+    {"Input Bus (Steam)", 1},
+    {"Output Bus (Steam)", 1},
+    {"Steam Hatch", 1}
   },
   ["Steam Grinder|2"] = {
     {"Steam Grinder", 1},
-    {"Solid Steel Machine Casing", 25}
+    {"Solid Steel Machine Casing", 22},
+    {"Input Bus (Steam)", 1},
+    {"Output Bus (Steam)", 1},
+    {"Steam Hatch", 1}
   },
   ["Steam Squasher|1"] = {
     {"Steam Squasher", 1},
-    {"Bronze Plated Bricks", 33}
+    {"Bronze Plated Bricks", 30},
+    {"Input Bus (Steam)", 1},
+    {"Output Bus (Steam)", 1},
+    {"Steam Hatch", 1}
   },
   ["Steam Squasher|2"] = {
     {"Steam Squasher", 1},
-    {"Solid Steel Machine Casing", 33}
+    {"Solid Steel Machine Casing", 30},
+    {"Input Bus (Steam)", 1},
+    {"Output Bus (Steam)", 1},
+    {"Steam Hatch", 1}
   }
 }
 
@@ -658,6 +670,7 @@ function buildSteamGrinder(tier)
     sel(findItem("Solid Steel Machine Casing"))
   end
   square3()
+  
   u()
   f()
   f()
@@ -689,7 +702,45 @@ function buildSteamGrinder(tier)
   elseif(tier == 2) then
     sel(findItem("Solid Steel Machine Casing"))
   end
-  square3()
+  
+  f()
+  f()
+  f()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  place()
+  tr()
+  place()
+  ta()
+  place()
+  tr()
+  b()
+  place()
+  tr()
+  sel(findItem("Output Bus (Steam)"))
+  place()
+  sel(findItem("Wrench"))
+  equip()
+  robot.use(1)
+  unequip()
+  equip()
+  ta()
+  sel(findItem("Input Bus (Steam)"))
+  place()
+  sel(findItem("Wrench"))
+  equip()
+  robot.use(1)
+  unequip()
+  equip()
+  tr()
+  b()
+  sel(findItem("Steam Hatch"))
+  place()
+  
   d()
   d()
 end
@@ -708,7 +759,42 @@ function buildSteamSquasher(tier)
   b()
   square3HV()
   b()
-  square3HV()
+  
+  place()
+  u()
+  u()
+  sel(findItem("Steam Hatch"))
+  place()
+  tr()
+  f()
+  tl()
+  sel(findItem("Output Bus (Steam)"))
+  place()
+  d()
+  if(tier == 1) then
+    sel(findItem("Bronze Plated Bricks"))
+  elseif(tier == 2) then
+    sel(findItem("Solid Steel Machine Casing"))
+  end
+  place()
+  d()
+  place()
+  tl()
+  f()
+  f()
+  tr()
+  place()
+  u()
+  place()
+  u()
+  sel(findItem("Input Bus (Steam)"))
+  place()
+  d()
+  d()
+  tr()
+  f()
+  tl()
+  
   u()
   sel(findItem("Steam Squasher"))
   place()
