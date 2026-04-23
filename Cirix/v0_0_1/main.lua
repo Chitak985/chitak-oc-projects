@@ -316,6 +316,21 @@ function setUpCrafting(name, material)
     sel(findItem("Hammer"))
     swapTo(2, 1)
   end
+  if(name == "Bronze Plated Bricks") then
+    sel(findItem("Bronze Plate"))
+    swapTo(1, 1)
+    swapTo(3, 1)
+    swapTo(4, 1)
+    swapTo(6, 1)
+    swapTo(7, 1)
+    swapTo(8, 1)
+    sel(findItem("Hammer"))
+    swapTo(2, 1)
+    sel(findItem("Wrench"))
+    swapTo(8, 1)
+    sel(findItem("Bricks"))
+    swapTo(5, 1)
+  end
   if(name == "2x2") then
     sel(findItem(material))
     swapTo(1, 1)
@@ -330,7 +345,7 @@ function setUpCrafting(name, material)
   if(name == "1x2") then
     sel(findItem(material))
     swapTo(1, 1)
-    swapTo(2, 1)
+    swapTo(4, 1)
   end
 end
 function craft(nam, material, n)
@@ -919,8 +934,12 @@ else
   moveToNext3_3Front()
   if(canBuild("Steam Grinder|2")) then
     buildSteamGrinder(2)
-  elseif(canBuild("Steam Grinder|2")) then
+  elseif(canBuild("Steam Grinder|1")) then
     buildSteamGrinder(1)
+  else
+    if(countItem("Bronze Plated Bricks") < 22) then
+      craft("Bronze Plated Bricks",nil,22)
+    end
   end
   moveToNext3_3Front()
   if(canBuild("Steam Squasher|2")) then
