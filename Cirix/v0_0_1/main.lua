@@ -24,9 +24,10 @@ function sel(n)
   selectedSlot = n
 end
 function equip()
-  local stack = inventoryCache[selectedSlot]
   if ic.equip() then
-    inventoryCache[selectedSlot], equipped = equipped, stack
+    local tmp = equipped
+    equipped = inventoryCache[selectedSlot]
+    inventoryCache[selectedSlot] = tmp
   end
 end
 function swapTo(toSlot, amount, item)
