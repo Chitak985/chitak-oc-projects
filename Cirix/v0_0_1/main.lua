@@ -345,36 +345,47 @@ end
 -- Compressing
 function compress(nam, n)
   setupMachine("Compressor", "ULV")
+  local checks = 0
+
+  -- Go to input
+  u()
+  tr()
+  f()
+  tl()
+
+  -- Add input
   if(nam == "Advanced Coke Oven Brick (Block)") then
-    u()
-    tr()
-    f()
-    tl()
+    sel(findItem("Advanced Coke Oven Brick (Brick)"))
     for i=1,4*n do
-      sel(findItem("Advanced Coke Oven Brick (Brick)"))
       robot.drop(1)
     end
-    tl()
-    f()
-    tr()
-    d()
-    -- TODO: softlock alert, moar failsafes
-    sel(findItem("Vajra"))
-    equip()
-    sel(findItem("Hopper"))
-    while true do
-      robot.swing()
-      robot.place()
-      checks = checks + 1
-      if checks % 10 == 0 then  -- refresh every 10 cycles
-        refreshInventory()
-        if(countItem("Advanced Coke Oven Brick (Block)") >= n) then
-          break
-        end
+  end
+
+  -- Go to output
+  tl()
+  f()
+  tr()
+  d()
+
+  -- Start cycle
+  sel(findItem("Vajra"))
+  equip()
+  sel(findItem("Hopper"))
+  local continue = true
+  while continue do
+    robot.swing()
+    robot.place()
+    checks = checks + 1
+    if checks % 10 == 0 then  -- refresh every 10 cycles
+      refreshInventory()
+      if(countItem(nam) >= n) then
+        continue = false
       end
     end
-    refreshInventory()
   end
+  refreshInventory()
+
+  -- Finish
   dismantleMachine("Compressor")
 end
 
