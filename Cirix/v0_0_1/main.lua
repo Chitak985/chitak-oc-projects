@@ -29,9 +29,14 @@ function equip()
     inventoryCache[selectedSlot], equipped = equipped, stack
   end
 end
-function swapTo(toSlot, amount)
+function swapTo(toSlot, amount, item)
   local e = robot.transferTo(toSlot, amount)
   refreshInventory()  -- I'm too scared to do the full version
+  if(item) then  -- Safe mode, activates only if an item is given
+    if(not inventoryCache[selectedSlot]) then  -- Check if there are items left
+      sel(findItem(item))  -- Select a new item stack
+    end
+  end
   return e
 end
 function placeCheck(success)
@@ -296,46 +301,46 @@ function setUpCrafting(name, material)
   -- TODO: Use tables for crafting layouts
   if(name == "Hammer") then
     sel(findItem(material))
-    swapTo(1, 1)
-    swapTo(2, 1)
-    swapTo(5, 1)
-    swapTo(6, 1)
-    swapTo(9, 1)
-    swapTo(10, 1)
+    swapTo(1, 1, material)
+    swapTo(2, 1, material)
+    swapTo(5, 1, material)
+    swapTo(6, 1, material)
+    swapTo(9, 1, material)
+    swapTo(10, 1, material)
     sel(findItem("Stick"))
     swapTo(7, 1)
   end
   if(name == "Wrench") then
     sel(findItem(material))
-    swapTo(1, 1)
-    swapTo(3, 1)
-    swapTo(5, 1)
-    swapTo(6, 1)
-    swapTo(7, 1)
-    swapTo(10, 1)
+    swapTo(1, 1, material)
+    swapTo(3, 1, material)
+    swapTo(5, 1, material)
+    swapTo(6, 1, material)
+    swapTo(7, 1, material)
+    swapTo(10, 1, material)
     sel(findItem("Hammer"))
     swapTo(2, 1)
   end
   if(name == "Bronze Plated Bricks") then
     sel(findItem("Bronze Plate"))
-    swapTo(1, 1)
-    swapTo(3, 1)
-    swapTo(4, 1)
-    swapTo(6, 1)
-    swapTo(7, 1)
-    swapTo(8, 1)
+    swapTo(1, 1, "Bronze Plate")
+    swapTo(3, 1, "Bronze Plate")
+    swapTo(5, 1, "Bronze Plate")
+    swapTo(7, 1, "Bronze Plate")
+    swapTo(9, 1, "Bronze Plate")
+    swapTo(11, 1, "Bronze Plate")
     sel(findItem("Hammer"))
     swapTo(2, 1)
     sel(findItem("Wrench"))
-    swapTo(8, 1)
+    swapTo(10, 1)
     sel(findItem("Bricks"))
-    swapTo(5, 1)
+    swapTo(6, 1)
   end
   if(name == "2x2") then
     sel(findItem(material))
-    swapTo(1, 1)
-    swapTo(2, 1)
-    swapTo(5, 1)
+    swapTo(1, 1, material)
+    swapTo(2, 1, material)
+    swapTo(5, 1, material)
     swapTo(6, 1)
   end
   if(name == "1x1") then
@@ -344,8 +349,8 @@ function setUpCrafting(name, material)
   end
   if(name == "1x2") then
     sel(findItem(material))
-    swapTo(1, 1)
-    swapTo(4, 1)
+    swapTo(1, 1, material)
+    swapTo(5, 1)
   end
 end
 function craft(nam, material, n)
