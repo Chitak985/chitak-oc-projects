@@ -1,5 +1,4 @@
 -- wget https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/main.lua && main
--- TODO: Replace sel(findItem("e")) to avoid findItem returning nil and breaking everything
 local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
@@ -103,7 +102,7 @@ local itemMap = {
   }
 }
 -- Multiblock construction requirements (mostly used by canBuild())
--- Multiblock names are formatted as "name|tier"
+--Multiblock names are formatted as "name|tier"
 local multiblocks = {
   ["Coke Oven"] = {
     {"Coke Oven Brick (Block)", 26}
@@ -152,6 +151,32 @@ local multiblocks = {
     {"Steam Hatch", 1}
   }
 }
+-- Recipes that the robot can do.
+--Setup is passed as the recipe "name" to the crafter functions and, optionally, it recieves a material.
+--Currently the only possible recipes are "crafting" and "compressing"
+local recipeMap = {
+  ["Hammer"] = {
+    {recipe="crafting", setup="Hammer", material="Iron Ingot"}
+  },
+  ["Wrench"] = {
+    {recipe="crafting", setup="Wrench", material="Iron Ingot"}
+  },
+  ["Oak Planks"] = {
+    {recipe="crafting", setup="1x1", material="Oak Log", result=2}
+  },
+  ["Sticks"] = {
+    {recipe="crafting", setup="1x2", material="Oak Planks", result=2}
+  },
+  ["Coke Oven Brick (Block)"] = {
+    {recipe="crafting", setup="2x2", material="Coke Oven Brick (Brick)"}
+  },
+  ["Advanced Coke Oven Brick (Block)"] = {
+    {recipe="compressing", setup="Advanced Coke Oven Brick (Brick)"}
+  },
+  ["Bronze Plated Bricks"] = {
+    {recipe="crafting", setup="Bronze Plated Bricks"}
+  }
+}
 
 ----- HELPER ITEM OPERATIONS -----
 -- Matching
@@ -178,12 +203,30 @@ function matches(stack, targetName)
 end
 
 -- Find item
+--This function will try to craft an item if one is missing.
+--Since the crafter functions call this function too, it is possible to end up with a large crafting chain.
+--For example, a steam grinder requests bronze plated bricks, which request bricks, which request a compressor for 4x brick, which request an alloy smelter for clay and mold(brick), which request clay mining.
+--This is done to avoid passing nil to the select function under all circumstances, so it is importnant to cover every recipe the robot may use.
+--If an item is requested but it is not found and cannot be made/mined, the function will pass nil, killing the robot with an exception.
 function findItem(targetName)
+  -- Find the item
   for slot = 1, invSize do
     if matches(inventoryCache[slot], targetName) then
       return slot
     end
   end
+  -- If there is no such item, attempt to craft it
+  local tmp = recipeMap[targetName]
+  if tmp then
+    -- Only crafts one to avoid useless resource usage
+    if tmp[recipe] == "crafting" then
+      craft(tmp[setup], tmp[material], 1)
+    end
+    if tmp[recipe] == "compressing" then
+      compress(tmp[setup], 1)
+    end
+  end
+  -- If can't craft it, the robot will die (unhandled exception)
   return nil
 end
 
@@ -214,9 +257,10 @@ function unequip()
   for slot = 1,invSize,1 do
     if getSlot(slot) == nil then
       sel(slot)
-      break
+      return true
     end
   end
+  return false
   -- TODO: Failsafe if no slots left
 end
 
@@ -367,7 +411,7 @@ end
 
 -- Compressing
 function compress(nam, n)
-  setupMachine("Compressor", "ULV")
+  setupMachine("Compressor", "ULV")  -- TODO: Add handling to use compressors from other tiers
   local checks = 0
 
   -- Go to input
