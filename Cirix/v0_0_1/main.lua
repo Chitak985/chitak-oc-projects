@@ -381,6 +381,9 @@ function compress(nam, n)
     sel(findItem("Advanced Coke Oven Brick (Brick)"))
     for i=1,4*n do
       robot.drop(1)
+      if(not ic.getStackInInternalSlot(selectedSlot)) then  -- Check if there are items left
+        sel(findItem("Advanced Coke Oven Brick (Brick)"))  -- Select a new item stack
+      end
     end
   end
 
