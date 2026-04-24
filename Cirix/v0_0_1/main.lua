@@ -22,9 +22,11 @@ end
 function sel(n)
   robot.select(n)
   selectedSlot = n
+  print(selectedSlot)
 end
 function equip()
   if ic.equip() then
+    print(selectedSlot)
     local tmp = equipped
     equipped = inventoryCache[selectedSlot]
     inventoryCache[selectedSlot] = tmp
