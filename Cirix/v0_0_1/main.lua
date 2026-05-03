@@ -17,6 +17,9 @@ function refreshInventory()
     inventoryCache[slot] = ic.getStackInInternalSlot(slot) -- can be nil or stack table
   end
 end
+function refreshSelectedSlot()
+  selectedSlot = robot.select()
+end
 -- Fuction overrides
 function sel(n)
   robot.select(n)
