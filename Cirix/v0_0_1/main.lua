@@ -1,5 +1,4 @@
 -- wget https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/main.lua && main
--- TODO: Replace sel(findItem("e")) to avoid findItem returning nil and breaking everything
 local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
@@ -103,70 +102,101 @@ local craftingData = {
 }
 
 ----- HELPER ITEM OPERATIONS -----
--- Matching
+----- ITEM MATCHING -----
 function matches(stack, targetName)
   if not stack then return false end
 
   local defs = itemMap[targetName]
 
-  -- If special definition exists, use it
   if defs then
     for _, def in ipairs(defs) do
       local labelMatch = (not def.label) or (stack.label == def.label)
       local nameMatch  = (not def.name)  or (stack.name  == def.name)
-
-      if labelMatch and nameMatch then
-        return true
-      end
+      if labelMatch and nameMatch then return true end
     end
     return false
   end
 
-  -- Default behavior: match by display name
   return stack.label == targetName
 end
 
--- Find item
-function findItem(targetName)
-  local size = inv()
-  for slot = 1, size do
-    if matches(getSlot(slot), targetName) then
+----- BASIC INVENTORY -----
+function findItem(name)
+  for slot = 1, inv() do
+    if matches(getSlot(slot), name) then
       return slot
     end
   end
-
-  if(canCraft(targetName)) then
-    craft(targetName, nil, 1)
-  end
-
-  -- Try again after crafting the item
-  local size = inv()
-  for slot = 1, size do
-    if matches(getSlot(slot), targetName) then
-      return slot
-    end
-  end
+  return nil
 end
 
--- Has item
-function hasItem(targetName)
-  return findItem(targetName) ~= nil
-end
-
--- Count an item
-function countItem(targetName)
-  local count = 0
-  local size = inv()
-
-  for slot = 1, size do
+function countItem(name)
+  local total = 0
+  for slot = 1, inv() do
     local stack = getSlot(slot)
-    if matches(stack, targetName) then
-      count = count + stack.size
+    if matches(stack, name) then
+      total = total + stack.size
+    end
+  end
+  return total
+end
+
+function hasItem(name)
+  return countItem(name) > 0
+end
+
+----- SAFE SELECT -----
+function selectItem(name)
+  if not ensureItem(name, 1) then
+    error("Missing item: " .. tostring(name))
+  end
+
+  local slot = findItem(name)
+  if not slot then
+    error("Item vanished: " .. tostring(name))
+  end
+
+  sel(slot)
+  return slot
+end
+
+----- ENSURE ITEM (CRAFTING CORE) -----
+function ensureItem(name, amount)
+  amount = amount or 1
+
+  if countItem(name) >= amount then
+    return true
+  end
+
+  local recipe = craftingData[name]
+  if not recipe then
+    return false
+  end
+
+  local missing = amount - countItem(name)
+
+  -- ensure ingredients first
+  for _, req in ipairs(recipe) do
+    local item, count = req[1], req[2]
+    local needed = count * missing
+
+    if countItem(item) < needed then
+      if not ensureItem(item, needed) then
+        return false
+      end
     end
   end
 
-  return count
+  -- craft items
+  for i = 1, missing do
+    clearForCrafting()
+    setUpCrafting(name)
+    cr.craft(1)
+  end
+
+  return true
 end
+
 
 ----- HELPER FUNCTIONS -----
 -- Select empty
@@ -199,48 +229,27 @@ function canBuild(name, tier)
   return true
 end
 
--- Can craft item
-function canCraft(name)
-  if(craftingData[name]) then
-    -- Find the recipe in data
-    for _, req in ipairs(craftingData[name]) do
-      local item, count = req[1], req[2]
-      if countItem(item) < count then
-        if canCraft(item) then
-          craft(item, nil, count - countItem(item))
-        else
-          return false
-        end
-      end
-    end
-    -- Can build if nothing stopped the function
-    return true
-  end
-  -- If the if didn't work, that means there is no crafting recipe for the item
-  return false
-end
-
 -- Singleblock setup
 function setupMachine(machine, tier)
   if(machine == "Compressor") then
     if(tier == "LV" or tier == "ULV") then
       f()
-      sel(findItem("Dirt"))
+      selectItem(("Dirt"))
       place()
       b()
-      sel(findItem("Hopper"))
+      selectItem(("Hopper"))
       place()
       u()
       f()
-      sel(findItem("Basic Solar Panel"))
+      selectItem(("Basic Solar Panel"))
       place()
       b()
-      sel(findItem("Basic Compressor"))
+      selectItem(("Basic Compressor"))
       place()
       tr()
       f()
       tl()
-      sel(findItem("Hopper"))
+      selectItem(("Hopper"))
       place()
       tl()
       f()
@@ -253,7 +262,7 @@ end
 -- Singleblock dismantle
 function dismantleMachine(machine)
   if(machine == "Compressor") then
-    sel(findItem("Vajra"))
+    selectItem(("Vajra"))
     equip()
     u()
     swing()
@@ -290,101 +299,111 @@ end
 function setUpCrafting(name, material)
   -- TODO: Use tables for crafting layouts
   if(name == "Hammer") then
-    sel(findItem("Iron Ingot"))
+    selectItem(("Iron Ingot"))
     swapTo(1, 1)
     swapTo(2, 1)
     swapTo(5, 1)
     swapTo(6, 1)
     swapTo(9, 1)
     swapTo(10, 1)
-    sel(findItem("Stick"))
+    selectItem(("Stick"))
     swapTo(7, 1)
   end
   if(name == "Wrench") then
-    sel(findItem("Iron Ingot"))
+    selectItem(("Iron Ingot"))
     swapTo(1, 1)
     swapTo(3, 1)
     swapTo(5, 1)
     swapTo(6, 1)
     swapTo(7, 1)
     swapTo(10, 1)
-    sel(findItem("Hammer"))
+    selectItem(("Hammer"))
     swapTo(2, 1)
   end
   if(name == "Coke Oven Brick (Block)") then
-    sel(findItem("Coke Oven Brick (Brick)"))
+    selectItem(("Coke Oven Brick (Brick)"))
     swapTo(1, 1)
     swapTo(2, 1)
     swapTo(5, 1)
     swapTo(6, 1)
   end
   if(name == "Stick") then
-    sel(findItem("Oak Planks"))
+    selectItem(("Oak Planks"))
     swapTo(1, 1)
     swapTo(2, 1)
   end
   if(name == "Oak Planks") then
-    sel(findItem("Oak Log"))
+    selectItem(("Oak Log"))
     swapTo(1, 1)
   end
   if(name == "2x2") then
-    sel(findItem(material))
+    selectItem(material)
     swapTo(1, 1)
     swapTo(2, 1)
     swapTo(5, 1)
     swapTo(6, 1)
   end
   if(name == "1x1") then
-    sel(findItem(material))
+    selectItem(material)
     swapTo(1, 1)
   end
   if(name == "1x2") then
-    sel(findItem(material))
+    selectItem(material)
     swapTo(1, 1)
     swapTo(2, 1)
   end
 end
-function craft(nam, material, n)
-  for i=1,n,1 do
-    if(craftingData[nam]) then
-      if(canCraft(nam)) then
-        clearForCrafting()
-        setUpCrafting(nam, material, 1)
-        cr.craft(1)
-      else
-        for _, req in ipairs(craftingData[nam]) do
-          local item, count = req[1], req[2]
-          if countItem(item) < count then
-            craft(item, nil, count - countItem(item))
-          end
-        end
-      end
-    else
-      print("craft("+tostring(nam)+", "+tostring(material)+", "+tostring(n)+"): Death by lack of item")
-    end
-  end
+
+----- SIMPLE CRAFT WRAPPER -----
+function craft(name, _, amount)
+  amount = amount or 1
+  return ensureItem(name, amount)
 end
 
 -- Compressing
 function compress(nam, n)
-  setupMachine("Compressor", "ULV")
-  for i=1,n,1 do
-    if(nam == "Advanced Coke Oven Brick (Block)") then
-      u()
-      tr()
-      f()
-      tl()
-      sel(findItem("Advanced Coke Oven Brick (Brick)"))
-      robot.drop(4)
-      tl()
-      f()
-      tr()
-      d()
-      -- TODO: softlock alert, moar failsafes
-      while not robot.suck() do
+  setupMachine("Compressor", "ULV")  -- TODO: Add handling to use compressors from other tiers
+  local checks = 0
+
+  -- Go to input
+  u()
+  tr()
+  f()
+  tl()
+
+  -- Add input
+  if(nam == "Advanced Coke Oven Brick (Block)") then
+    for i=1,(4*n)//64 do
+      selectItem("Advanced Coke Oven Brick (Brick)")
+      robot.drop(64)
+    end
+    selectItem("Advanced Coke Oven Brick (Brick)")
+    robot.drop((4*n) - (64 * ((4*n)//64)))
+  end
+
+  -- Go to output
+  tl()
+  f()
+  tr()
+  d()
+
+  -- Start cycle
+  selectItem("Vajra")
+  equip()
+  selectItem("Hopper")
+  local continue = true
+  while continue do
+    robot.swing()
+    robot.place()
+    checks = checks + 1
+    if checks % 10 == 0 then  -- refresh every 10 cycles
+      if(countItem(nam) >= n) then
+        continue = false
       end
     end
   end
+
+  -- Finish
   dismantleMachine("Compressor")
 end
 
@@ -505,7 +524,7 @@ function buildEBF() --Using old code because new doesn't work
   f()
   f()
   ta()
-  sel(findItem("LV Energy Hatch"))
+  selectItem(("LV Energy Hatch"))
   place()
   tr()
   f()
@@ -515,7 +534,7 @@ function buildEBF() --Using old code because new doesn't work
   f()
   f()
   tr()
-  sel(findItem("Heat Proof Machine Casing"))
+  selectItem(("Heat Proof Machine Casing"))
   place()
   tl()
   f()
@@ -523,7 +542,7 @@ function buildEBF() --Using old code because new doesn't work
   f()
   f()
   tr()
-  sel(findItem("Maintenance Hatch"))
+  selectItem(("Maintenance Hatch"))
   place()
   tl()
   f()
@@ -531,7 +550,7 @@ function buildEBF() --Using old code because new doesn't work
   tr()
   f()
   tr()
-  sel(findItem("Input Hatch (LV)"))
+  selectItem(("Input Hatch (LV)"))
   place()
   tl()
   f()
@@ -541,12 +560,12 @@ function buildEBF() --Using old code because new doesn't work
   f()
   f()
   tr()
-  sel(findItem("Output Bus (LV)"))
+  selectItem(("Output Bus (LV)"))
   place()
   tr()
   f()
   tl()
-  sel(findItem("Input Bus (LV)"))
+  selectItem(("Input Bus (LV)"))
   place()
   tr()
   f()
@@ -555,13 +574,13 @@ function buildEBF() --Using old code because new doesn't work
   f()
   tl()
   f()
-  sel(findItem("Heat Proof Machine Casing"))
+  selectItem(("Heat Proof Machine Casing"))
   place()
   b()
-  sel(findItem("Electric Blast Furnace"))
+  selectItem(("Electric Blast Furnace"))
   place()
   
-  sel(findItem("Cupronickel Coil Block"))
+  selectItem(("Cupronickel Coil Block"))
   for i = 1,2,1 
   do
     u()
@@ -595,7 +614,7 @@ function buildEBF() --Using old code because new doesn't work
   f()
   f()
   tr()
-  sel(findItem("Heat Proof Machine Casing"))
+  selectItem(("Heat Proof Machine Casing"))
   place()
   ta()
   place()
@@ -608,9 +627,9 @@ function buildEBF() --Using old code because new doesn't work
   place()
   tr()
   u()
-  sel(findItem("Muffler Hatch (LV)"))
+  selectItem(("Muffler Hatch (LV)"))
   placeD()
-  sel(findItem("Wrench"))
+  selectItem(("Wrench"))
   equip()
   robot.useDown(1)
   unequip()
@@ -618,13 +637,13 @@ function buildEBF() --Using old code because new doesn't work
   b()
   d()
   tr()
-  sel(findItem("Heat Proof Machine Casing"))
+  selectItem(("Heat Proof Machine Casing"))
   place()
   ta()
   place()
   tr()
   b()
-  sel(findItem("Output Hatch (LV)"))
+  selectItem(("Output Hatch (LV)"))
   place()
   
   d()
@@ -637,7 +656,7 @@ function buildEBF() --Using old code because new doesn't work
   f()
   f()
   tl()
-  sel(findItem("BrainTech Aerospace Advanced Reinforced Duct Tape FAL-84"))
+  selectItem(("BrainTech Aerospace Advanced Reinforced Duct Tape FAL-84"))
   equip()
   robot.use(2)
   unequip()
@@ -651,7 +670,7 @@ function buildEBF() --Using old code because new doesn't work
   tr()
 end
 function buildCokeOven()
-  sel(findItem("Coke Oven Brick (Block)"))
+  selectItem(("Coke Oven Brick (Block)"))
   square3()
   u()
   square3H()
@@ -661,7 +680,7 @@ function buildCokeOven()
   d()
 end
 function buildAdvancedCokeOven()
-  sel(findItem("Advanced Coke Oven Brick (Block)"))
+  selectItem(("Advanced Coke Oven Brick (Block)"))
   square3()
   u()
   square3H()
@@ -675,9 +694,9 @@ function buildAdvancedCokeOven()
 end
 function buildSteamGrinder(tier)
   if(tier == 1) then
-    sel(findItem("Bronze Plated Bricks"))
+    selectItem(("Bronze Plated Bricks"))
   elseif(tier == 2) then
-    sel(findItem("Solid Steel Machine Casing"))
+    selectItem(("Solid Steel Machine Casing"))
   end
   square3()
   u()
@@ -703,13 +722,13 @@ function buildSteamGrinder(tier)
   place()
   tr()
   b()
-  sel(findItem("Steam Grinder"))
+  selectItem(("Steam Grinder"))
   place()
   u()
   if(tier == 1) then
-    sel(findItem("Bronze Plated Bricks"))
+    selectItem(("Bronze Plated Bricks"))
   elseif(tier == 2) then
-    sel(findItem("Solid Steel Machine Casing"))
+    selectItem(("Solid Steel Machine Casing"))
   end
   square3()
   d()
@@ -717,9 +736,9 @@ function buildSteamGrinder(tier)
 end
 function buildSteamSquasher(tier)
   if(tier == 1) then
-    sel(findItem("Bronze Plated Bricks"))
+    selectItem(("Bronze Plated Bricks"))
   elseif(tier == 2) then
-    sel(findItem("Solid Steel Machine Casing"))
+    selectItem(("Solid Steel Machine Casing"))
   end
   f()
   f()
@@ -732,7 +751,7 @@ function buildSteamSquasher(tier)
   b()
   square3HV()
   u()
-  sel(findItem("Steam Squasher"))
+  selectItem(("Steam Squasher"))
   place()
   d()
 end
@@ -808,9 +827,7 @@ end
 if(hasItem("Dimensionally Transcendent Plasma Forge")) then
   ovens()
 else
-  if(not hasItem("Wrench")) then
-    craft("Wrench", "Iron Ingot", 1)
-  end
+  ensureItem("Wrench", 1)
   if(countItem("Coke Oven Brick (Block)") < 26) then
     craft("2x2","Coke Oven Brick (Brick)",26)
   end
