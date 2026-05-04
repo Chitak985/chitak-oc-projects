@@ -95,10 +95,10 @@ local craftingData = {
     {"Oak Planks", 2}
   },
   ["Oak Planks"] = {
-    {"Oak Log", 2}
+    {"Oak Log", 1}
   },
   ["Coke Oven Brick (Block)"] = {
-    {"Coke Oven Brick", 4}
+    {"Coke Oven Brick (Brick)", 4}
   }
 }
 
@@ -206,8 +206,9 @@ function canCraft(name)
     for _, req in ipairs(craftingData[name]) do
       local item, count = req[1], req[2]
       if countItem(item) < count then
-        -- If can't craft it, that means there is no crafting recipe for the item
-        if not canCraft(item) then
+        if canCraft(item) then
+          craft(item, nil, count - countItem(item))
+        else
           return false
         end
       end
@@ -289,7 +290,7 @@ end
 function setUpCrafting(name, material)
   -- TODO: Use tables for crafting layouts
   if(name == "Hammer") then
-    sel(findItem(material))
+    sel(findItem("Iron Ingot"))
     swapTo(1, 1)
     swapTo(2, 1)
     swapTo(5, 1)
@@ -300,7 +301,7 @@ function setUpCrafting(name, material)
     swapTo(7, 1)
   end
   if(name == "Wrench") then
-    sel(findItem(material))
+    sel(findItem("Iron Ingot"))
     swapTo(1, 1)
     swapTo(3, 1)
     swapTo(5, 1)
@@ -309,6 +310,22 @@ function setUpCrafting(name, material)
     swapTo(10, 1)
     sel(findItem("Hammer"))
     swapTo(2, 1)
+  end
+  if(name == "Coke Oven Brick (Block)") then
+    sel(findItem("Coke Oven Brick (Brick)"))
+    swapTo(1, 1)
+    swapTo(2, 1)
+    swapTo(5, 1)
+    swapTo(6, 1)
+  end
+  if(name == "Stick") then
+    sel(findItem("Oak Planks"))
+    swapTo(1, 1)
+    swapTo(2, 1)
+  end
+  if(name == "Oak Planks") then
+    sel(findItem("Oak Log"))
+    swapTo(1, 1)
   end
   if(name == "2x2") then
     sel(findItem(material))
