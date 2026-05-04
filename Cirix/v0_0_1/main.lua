@@ -122,7 +122,6 @@ end
 
 ----- BASIC INVENTORY -----
 function findItem(name)
-  print("Finding item "..tostring(name))
   for slot = 1, inv() do
     if matches(getSlot(slot), name) then
       return slot
@@ -132,7 +131,6 @@ function findItem(name)
 end
 
 function countItem(name)
-  print("Counting item "..tostring(name))
   local total = 0
   for slot = 1, inv() do
     local stack = getSlot(slot)
@@ -144,13 +142,11 @@ function countItem(name)
 end
 
 function hasItem(name)
-  print("Checking for item "..tostring(name))
   return countItem(name) > 0
 end
 
 ----- SAFE SELECT -----
 function selectItem(name)
-  print("Selecting item "..tostring(name))
   if not ensureItem(name, 1) then
     error("Missing item: " .. tostring(name))
   end
@@ -166,7 +162,6 @@ end
 
 ----- ENSURE ITEM (CRAFTING CORE) -----
 function ensureItem(name, amount)
-  print("Ensuring item "..tostring(name).." with amount "..tostring(amount))
   amount = amount or 1
 
   if countItem(name) >= amount then
@@ -267,7 +262,7 @@ end
 -- Singleblock dismantle
 function dismantleMachine(machine)
   if(machine == "Compressor") then
-    selectItem(("Vajra"))
+    sel(findItem("Vajra"))
     equip()
     u()
     swing()
@@ -361,7 +356,6 @@ end
 
 ----- SIMPLE CRAFT WRAPPER -----
 function craft(name, _, amount)
-  print("Crafting item "..tostring(name).." with amount "..tostring(amount))
   amount = amount or 1
   return ensureItem(name, amount)
 end
@@ -397,14 +391,13 @@ function compress(nam, n)
   selectItem("Vajra")
   equip()
   selectItem("Hopper")
-  local continue = true
-  while continue do
+  while true do
     robot.swing()
     robot.place()
     checks = checks + 1
     if checks % 10 == 0 then  -- refresh every 10 cycles
       if(countItem(nam) >= n) then
-        continue = false
+        break
       end
     end
   end
@@ -835,7 +828,7 @@ if(hasItem("Dimensionally Transcendent Plasma Forge")) then
 else
   ensureItem("Wrench", 1)
   if(countItem("Coke Oven Brick (Block)") < 26) then
-    craft("2x2","Coke Oven Brick (Brick)",26)
+    craft("Coke Oven Brick (Block)","Coke Oven Brick (Brick)",26)
   end
   if(countItem("Advanced Coke Oven Brick (Block)") < 34) then
     compress("Advanced Coke Oven Brick (Block)",34)
