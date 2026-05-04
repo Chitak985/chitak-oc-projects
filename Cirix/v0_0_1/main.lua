@@ -122,6 +122,7 @@ end
 
 ----- BASIC INVENTORY -----
 function findItem(name)
+  print("Finding item "+tostring(name))
   for slot = 1, inv() do
     if matches(getSlot(slot), name) then
       return slot
@@ -131,6 +132,7 @@ function findItem(name)
 end
 
 function countItem(name)
+  print("Counting item "+tostring(name))
   local total = 0
   for slot = 1, inv() do
     local stack = getSlot(slot)
@@ -142,11 +144,13 @@ function countItem(name)
 end
 
 function hasItem(name)
+  print("Checking for item "+tostring(name))
   return countItem(name) > 0
 end
 
 ----- SAFE SELECT -----
 function selectItem(name)
+  print("Selecting item "+tostring(name))
   if not ensureItem(name, 1) then
     error("Missing item: " .. tostring(name))
   end
@@ -162,6 +166,7 @@ end
 
 ----- ENSURE ITEM (CRAFTING CORE) -----
 function ensureItem(name, amount)
+  print("Ensuring item "+tostring(name)+" with amount "+tostring(amount))
   amount = amount or 1
 
   if countItem(name) >= amount then
@@ -356,6 +361,7 @@ end
 
 ----- SIMPLE CRAFT WRAPPER -----
 function craft(name, _, amount)
+  print("Crafting item "+tostring(name)+" with amount "+tostring(amount))
   amount = amount or 1
   return ensureItem(name, amount)
 end
