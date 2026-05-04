@@ -1,72 +1,9 @@
 -- wget https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/main.lua && main
+-- TODO: Replace sel(findItem("e")) to avoid findItem returning nil and breaking everything
 local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
-local invSize = robot.inventorySize()
-
------ CACHED INVENTORY -----
--- Data
-local inventoryCache = {}
-local selectedSlot = 1
-local equipped = nil
--- Cache inventory
-function refreshInventory()
-  inventoryCache = {}
-  for slot = 1, invSize do
-    inventoryCache[slot] = ic.getStackInInternalSlot(slot) -- can be nil or stack table
-  end
-end
-function refreshSelectedSlot()
-  selectedSlot = robot.select()
-end
--- Fuction overrides
-function sel(n)
-  robot.select(n)
-  selectedSlot = n
-  print(selectedSlot)
-end
-function equip()
-  if ic.equip() then
-    print(selectedSlot)
-    local tmp = equipped
-    equipped = inventoryCache[selectedSlot]
-    inventoryCache[selectedSlot] = tmp
-  end
-end
-function swapTo(toSlot, amount, item)
-  local e = robot.transferTo(toSlot, amount)
-  refreshInventory()  -- I'm too scared to do the full version
-  if(item) then  -- Safe mode, activates only if an item is given
-    if(not inventoryCache[selectedSlot]) then  -- Check if there are items left
-      sel(findItem(item))  -- Select a new item stack
-    end
-  end
-  return e
-end
-function placeCheck(success)
-  if not success then return false end  -- FAILSAFE: if place fails then don't do anything
-
-  local stack = inventoryCache[selectedSlot]
-  if not stack then return true end -- FAILSAFE: shouldn't happen anyway
-
-  stack.size = stack.size - 1
-
-  if stack.size < 1 then
-    inventoryCache[selectedSlot] = nil
-  end
-
-  return true
-end
-function place()
-  return placeCheck(robot.place())
-end
-function placeU()
-  return placeCheck(robot.placeUp())
-end
-function placeD()
-  return placeCheck(robot.placeDown())
-end
 
 ----- SHORTENED FUNCTIONS -----
 -- TODO: Add failsafes to movement and other functions
@@ -77,16 +14,17 @@ function d()robot.down()end
 function tr()robot.turnRight()end
 function tl()robot.turnLeft()end
 function ta()robot.turnAround()end
-function getSlot(n)return inventoryCache[n]end  --function getSlot(n)return ic.getStackInInternalSlot(n)end
---function swapTo(n,n2)robot.transferTo(n,n2)end  OVERRIDEN IN INVENTORY CACHING
---function sel(n)robot.select(n)end  OVERRIDEN IN INVENTORY CACHING
---function place() robot.place() end  OVERRIDEN IN INVENTORY CACHING
---function placeU() robot.placeUp() end  OVERRIDEN IN INVENTORY CACHING
---function placeD() robot.placeDown() end  OVERRIDEN IN INVENTORY CACHING
-function swing() robot.swing() refreshInventory() end
-function swingU() robot.swingUp() refreshInventory() end
-function swingD() robot.swingDown() refreshInventory() end
---function equip()ic.equip()end  OVERRIDEN IN INVENTORY CACHING
+function getSlot(n)return ic.getStackInInternalSlot(n)end
+function inv()return robot.inventorySize()end
+function swapTo(n,n2)robot.transferTo(n,n2)end
+function sel(n)robot.select(n)end
+function place()robot.place()end
+function placeU()robot.placeUp()end
+function placeD()robot.placeDown()end
+function swing()robot.swing()end
+function swingU()robot.swingUp()end
+function swingD()robot.swingDown()end
+function equip()ic.equip()end
 
 ----- DATA -----
 -- Special items (mutiple items with the same display name)
@@ -105,7 +43,7 @@ local itemMap = {
   }
 }
 -- Multiblock construction requirements (mostly used by canBuild())
---Multiblock names are formatted as "name|tier"
+-- Multiblock names are formatted as "name|tier"
 local multiblocks = {
   ["Coke Oven"] = {
     {"Coke Oven Brick (Block)", 26}
@@ -127,57 +65,37 @@ local multiblocks = {
   },
   ["Steam Grinder|1"] = {
     {"Steam Grinder", 1},
-    {"Bronze Plated Bricks", 22},
-    {"Input Bus (Steam)", 1},
-    {"Output Bus (Steam)", 1},
-    {"Steam Hatch", 1}
+    {"Bronze Plated Bricks", 25}
   },
   ["Steam Grinder|2"] = {
     {"Steam Grinder", 1},
-    {"Solid Steel Machine Casing", 22},
-    {"Input Bus (Steam)", 1},
-    {"Output Bus (Steam)", 1},
-    {"Steam Hatch", 1}
+    {"Solid Steel Machine Casing", 25}
   },
   ["Steam Squasher|1"] = {
     {"Steam Squasher", 1},
-    {"Bronze Plated Bricks", 30},
-    {"Input Bus (Steam)", 1},
-    {"Output Bus (Steam)", 1},
-    {"Steam Hatch", 1}
+    {"Bronze Plated Bricks", 33}
   },
   ["Steam Squasher|2"] = {
     {"Steam Squasher", 1},
-    {"Solid Steel Machine Casing", 30},
-    {"Input Bus (Steam)", 1},
-    {"Output Bus (Steam)", 1},
-    {"Steam Hatch", 1}
+    {"Solid Steel Machine Casing", 33}
   }
 }
--- Recipes that the robot can do.
---Setup is passed as the recipe "name" to the crafter functions and, optionally, it recieves a material.
---Currently the only possible recipes are "crafting" and "compressing"
-local recipeMap = {
+
+-- Crafting construction requirements
+local craftingData = {
   ["Hammer"] = {
-    {recipe="crafting", setup="Hammer", material="Iron Ingot"}
+    {"Stick", 1},
+    {"Iron Ingot", 6}
   },
   ["Wrench"] = {
-    {recipe="crafting", setup="Wrench", material="Iron Ingot"}
+    {"Hammer", 1},
+    {"Iron Ingot", 6}
+  },
+  ["Stick"] = {
+    {"Oak Planks", 2}
   },
   ["Oak Planks"] = {
-    {recipe="crafting", setup="1x1", material="Oak Log", result=2}
-  },
-  ["Sticks"] = {
-    {recipe="crafting", setup="1x2", material="Oak Planks", result=2}
-  },
-  ["Coke Oven Brick (Block)"] = {
-    {recipe="crafting", setup="2x2", material="Coke Oven Brick (Brick)"}
-  },
-  ["Advanced Coke Oven Brick (Block)"] = {
-    {recipe="compressing", setup="Advanced Coke Oven Brick (Brick)"}
-  },
-  ["Bronze Plated Bricks"] = {
-    {recipe="crafting", setup="Bronze Plated Bricks"}
+    {"Oak Log", 2}
   }
 }
 
@@ -206,30 +124,13 @@ function matches(stack, targetName)
 end
 
 -- Find item
---This function will try to craft an item if one is missing.
---Since the crafter functions call this function too, it is possible to end up with a large crafting chain.
---For example, a steam grinder requests bronze plated bricks, which request bricks, which request a compressor for 4x brick, which request an alloy smelter for clay and mold(brick), which request clay mining.
---This is done to avoid passing nil to the select function under all circumstances, so it is importnant to cover every recipe the robot may use.
---If an item is requested but it is not found and cannot be made/mined, the function will pass nil, killing the robot with an exception.
 function findItem(targetName)
-  -- Find the item
-  for slot = 1, invSize do
-    if matches(inventoryCache[slot], targetName) then
+  local size = inv()
+  for slot = 1, size do
+    if matches(getSlot(slot), targetName) then
       return slot
     end
   end
-  -- If there is no such item, attempt to craft it
-  local tmp = recipeMap[targetName]
-  if tmp then
-    -- Only crafts one to avoid useless resource usage
-    if tmp[recipe] == "crafting" then
-      craft(tmp[setup], tmp[material], 1)
-    end
-    if tmp[recipe] == "compressing" then
-      compress(tmp[setup], 1)
-    end
-  end
-  -- If can't craft it, the robot will die (unhandled exception)
   return nil
 end
 
@@ -241,13 +142,12 @@ end
 -- Count an item
 function countItem(targetName)
   local count = 0
+  local size = inv()
 
-  for slot = 1, invSize do
-    local stack = inventoryCache[slot]
-    if stack then
-      if matches(stack, targetName) then
-        count = count + stack.size
-      end
+  for slot = 1, size do
+    local stack = getSlot(slot)
+    if matches(stack, targetName) then
+      count = count + stack.size
     end
   end
 
@@ -257,21 +157,38 @@ end
 ----- HELPER FUNCTIONS -----
 -- Select empty
 function unequip()
-  for slot = 1,invSize,1 do
+  for slot = 1,inv(),1 do
     if getSlot(slot) == nil then
       sel(slot)
-      return true
+      break
     end
   end
-  return false
   -- TODO: Failsafe if no slots left
 end
 
 -- Can build multi
-function canBuild(name)
+function canBuild(name, tier)
+  -- Handle tiered multis
+  if(tier) then
+    tmp = name .. "|" .. tostring(tier)
+  else
+    tmp = name
+  end
   -- Find the multi in data
-  -- IGNORE: The multiblock is always there since I call the fucntion myself
-  for _, req in ipairs(multiblocks[name]) do
+  for _, req in ipairs(multiblocks[tmp]) do
+    local item, count = req[1], req[2]
+    if countItem(item) < count then
+      return false
+    end
+  end
+  -- Can build if nothing stopped the function
+  return true
+end
+
+-- Can craft item
+function canCraft(name)
+  -- Find the multi in data
+  for _, req in ipairs(craftingData[tmp]) do
     local item, count = req[1], req[2]
     if countItem(item) < count then
       return false
@@ -313,7 +230,6 @@ end
 
 -- Singleblock dismantle
 function dismantleMachine(machine)
-  refreshSelectedSlot()
   if(machine == "Compressor") then
     sel(findItem("Vajra"))
     equip()
@@ -339,7 +255,8 @@ function clearForCrafting()
   do
     if(getSlot(slot)) then
       sel(slot)
-      for i = 14,invSize do
+      local size = inv()  -- Optimization... somehow
+      for i = 14,size do
         if(getSlot(i) == nil) then
           swapTo(i)
           break
@@ -352,46 +269,31 @@ function setUpCrafting(name, material)
   -- TODO: Use tables for crafting layouts
   if(name == "Hammer") then
     sel(findItem(material))
-    swapTo(1, 1, material)
-    swapTo(2, 1, material)
-    swapTo(5, 1, material)
-    swapTo(6, 1, material)
-    swapTo(9, 1, material)
-    swapTo(10, 1, material)
+    swapTo(1, 1)
+    swapTo(2, 1)
+    swapTo(5, 1)
+    swapTo(6, 1)
+    swapTo(9, 1)
+    swapTo(10, 1)
     sel(findItem("Stick"))
     swapTo(7, 1)
   end
   if(name == "Wrench") then
     sel(findItem(material))
-    swapTo(1, 1, material)
-    swapTo(3, 1, material)
-    swapTo(5, 1, material)
-    swapTo(6, 1, material)
-    swapTo(7, 1, material)
-    swapTo(10, 1, material)
-    sel(findItem("Hammer"))
-    swapTo(2, 1)
-  end
-  if(name == "Bronze Plated Bricks") then
-    sel(findItem("Bronze Plate"))
-    swapTo(1, 1, "Bronze Plate")
-    swapTo(3, 1, "Bronze Plate")
-    swapTo(5, 1, "Bronze Plate")
-    swapTo(7, 1, "Bronze Plate")
-    swapTo(9, 1, "Bronze Plate")
-    swapTo(11, 1, "Bronze Plate")
-    sel(findItem("Hammer"))
-    swapTo(2, 1)
-    sel(findItem("Wrench"))
-    swapTo(10, 1)
-    sel(findItem("Bricks"))
+    swapTo(1, 1)
+    swapTo(3, 1)
+    swapTo(5, 1)
     swapTo(6, 1)
+    swapTo(7, 1)
+    swapTo(10, 1)
+    sel(findItem("Hammer"))
+    swapTo(2, 1)
   end
   if(name == "2x2") then
     sel(findItem(material))
-    swapTo(1, 1, material)
-    swapTo(2, 1, material)
-    swapTo(5, 1, material)
+    swapTo(1, 1)
+    swapTo(2, 1)
+    swapTo(5, 1)
     swapTo(6, 1)
   end
   if(name == "1x1") then
@@ -400,66 +302,51 @@ function setUpCrafting(name, material)
   end
   if(name == "1x2") then
     sel(findItem(material))
-    swapTo(1, 1, material)
-    swapTo(5, 1)
+    swapTo(1, 1)
+    swapTo(2, 1)
   end
 end
 function craft(nam, material, n)
   for i=1,n,1 do
-    clearForCrafting()
-    setUpCrafting(nam, material, 1)
-    cr.craft(1)
-    refreshInventory()
+    if(craftingData[nam]) then
+      if(canCraft(nam)) then
+        clearForCrafting()
+        setUpCrafting(nam, material, 1)
+        cr.craft(1)
+      else
+        for _, req in ipairs(craftingData[nam]) do
+          local item, count = req[1], req[2]
+          if countItem(item) < count then
+            craft(nam, nil, countItem(item) - count)
+          end
+        end
+      end
+    else
+      error("craft("+tostring(nam)+", "+tostring(material)+", "+tostring(n)+"): Death by lack of item")
+    end
   end
 end
 
 -- Compressing
 function compress(nam, n)
-  setupMachine("Compressor", "ULV")  -- TODO: Add handling to use compressors from other tiers
-  local checks = 0
-
-  -- Go to input
-  u()
-  tr()
-  f()
-  tl()
-
-  -- Add input
-  if(nam == "Advanced Coke Oven Brick (Block)") then
-    for i=1,(4*n)//64 do
+  setupMachine("Compressor", "ULV")
+  for i=1,n,1 do
+    if(nam == "Advanced Coke Oven Brick (Block)") then
+      u()
+      tr()
+      f()
+      tl()
       sel(findItem("Advanced Coke Oven Brick (Brick)"))
-      robot.drop(64)
-    end
-    sel(findItem("Advanced Coke Oven Brick (Brick)"))
-    robot.drop((4*n) - (64 * ((4*n)//64)))
-  end
-
-  -- Go to output
-  tl()
-  f()
-  tr()
-  d()
-
-  -- Start cycle
-  refreshInventory()
-  sel(findItem("Vajra"))
-  equip()
-  sel(findItem("Hopper"))
-  local continue = true
-  while continue do
-    robot.swing()
-    robot.place()
-    checks = checks + 1
-    if checks % 10 == 0 then  -- refresh every 10 cycles
-      refreshInventory()
-      if(countItem(nam) >= n) then
-        continue = false
+      robot.drop(4)
+      tl()
+      f()
+      tr()
+      d()
+      -- TODO: softlock alert, moar failsafes
+      while not robot.suck() do
       end
     end
   end
-  refreshInventory()
-
-  -- Finish
   dismantleMachine("Compressor")
 end
 
@@ -755,7 +642,6 @@ function buildSteamGrinder(tier)
     sel(findItem("Solid Steel Machine Casing"))
   end
   square3()
-  
   u()
   f()
   f()
@@ -787,45 +673,7 @@ function buildSteamGrinder(tier)
   elseif(tier == 2) then
     sel(findItem("Solid Steel Machine Casing"))
   end
-  
-  f()
-  f()
-  f()
-  tr()
-  place()
-  ta()
-  place()
-  tr()
-  b()
-  place()
-  tr()
-  place()
-  ta()
-  place()
-  tr()
-  b()
-  place()
-  tr()
-  sel(findItem("Output Bus (Steam)"))
-  place()
-  sel(findItem("Wrench"))
-  equip()
-  robot.use(1)
-  unequip()
-  equip()
-  ta()
-  sel(findItem("Input Bus (Steam)"))
-  place()
-  sel(findItem("Wrench"))
-  equip()
-  robot.use(1)
-  unequip()
-  equip()
-  tr()
-  b()
-  sel(findItem("Steam Hatch"))
-  place()
-  
+  square3()
   d()
   d()
 end
@@ -844,42 +692,7 @@ function buildSteamSquasher(tier)
   b()
   square3HV()
   b()
-  
-  place()
-  u()
-  u()
-  sel(findItem("Steam Hatch"))
-  place()
-  tr()
-  f()
-  tl()
-  sel(findItem("Output Bus (Steam)"))
-  place()
-  d()
-  if(tier == 1) then
-    sel(findItem("Bronze Plated Bricks"))
-  elseif(tier == 2) then
-    sel(findItem("Solid Steel Machine Casing"))
-  end
-  place()
-  d()
-  place()
-  tl()
-  f()
-  f()
-  tr()
-  place()
-  u()
-  place()
-  u()
-  sel(findItem("Input Bus (Steam)"))
-  place()
-  d()
-  d()
-  tr()
-  f()
-  tl()
-  
+  square3HV()
   u()
   sel(findItem("Steam Squasher"))
   place()
@@ -954,15 +767,9 @@ function ovens()
 end
 
 ----- MAIN CODE -----
-refreshInventory()
 if(hasItem("Dimensionally Transcendent Plasma Forge")) then
   ovens()
 else
-  craft("1x1","Oak Log",2)
-  craft("1x2","Oak Planks",2)
-  if(not hasItem("Hammer")) then
-    craft("Hammer", "Iron Ingot", 1)
-  end
   if(not hasItem("Wrench")) then
     craft("Wrench", "Iron Ingot", 1)
   end
@@ -991,19 +798,15 @@ else
     buildAdvancedCokeOven()
   end
   moveToNext3_3Front()
-  if(canBuild("Steam Grinder|2")) then
+  if(canBuild("Steam Grinder", 2)) then
     buildSteamGrinder(2)
-  elseif(canBuild("Steam Grinder|1")) then
+  elseif(canBuild("Steam Grinder", 1)) then
     buildSteamGrinder(1)
-  else
-    if(countItem("Bronze Plated Bricks") < 22) then
-      craft("Bronze Plated Bricks",nil,22)
-    end
   end
   moveToNext3_3Front()
-  if(canBuild("Steam Squasher|2")) then
+  if(canBuild("Steam Squasher", 2)) then
     buildSteamSquasher(2)
-  elseif(canBuild("Steam Squasher|1")) then
+  elseif(canBuild("Steam Squasher", 1)) then
     buildSteamSquasher(1)
   end
   moveToNext3_3Back()
