@@ -313,6 +313,7 @@ end
 
 -- Singleblock dismantle
 function dismantleMachine(machine)
+  refreshSelectedSlot()
   if(machine == "Compressor") then
     sel(findItem("Vajra"))
     equip()
