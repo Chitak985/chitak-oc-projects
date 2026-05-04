@@ -335,7 +335,7 @@ function craft(nam, material, n)
         for _, req in ipairs(craftingData[nam]) do
           local item, count = req[1], req[2]
           if countItem(item) < count then
-            craft(nam, nil, countItem(item) - count)
+            craft(nam, nil, count - countItem(item))
           end
         end
       end
