@@ -206,7 +206,10 @@ function canCraft(name)
     for _, req in ipairs(craftingData[name]) do
       local item, count = req[1], req[2]
       if countItem(item) < count then
-        return false
+        -- If can't craft it, that means there is no crafting recipe for the item
+        if not canCraft(item) then
+          return false
+        end
       end
     end
     -- Can build if nothing stopped the function
@@ -335,7 +338,7 @@ function craft(nam, material, n)
         for _, req in ipairs(craftingData[nam]) do
           local item, count = req[1], req[2]
           if countItem(item) < count then
-            craft(nam, nil, count - countItem(item))
+            craft(item, nil, count - countItem(item))
           end
         end
       end
