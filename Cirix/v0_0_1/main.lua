@@ -201,15 +201,19 @@ end
 
 -- Can craft item
 function canCraft(name)
-  -- Find the multi in data
-  for _, req in ipairs(craftingData[name]) do
-    local item, count = req[1], req[2]
-    if countItem(item) < count then
-      return false
+  if(craftingData[name]) then
+    -- Find the recipe in data
+    for _, req in ipairs(craftingData[name]) do
+      local item, count = req[1], req[2]
+      if countItem(item) < count then
+        return false
+      end
     end
+    -- Can build if nothing stopped the function
+    return true
   end
-  -- Can build if nothing stopped the function
-  return true
+  -- If the if didn't work, that means there is no crafting recipe for the item
+  return false
 end
 
 -- Singleblock setup
@@ -336,7 +340,7 @@ function craft(nam, material, n)
         end
       end
     else
-      error("craft("+tostring(nam)+", "+tostring(material)+", "+tostring(n)+"): Death by lack of item")
+      print("craft("+tostring(nam)+", "+tostring(material)+", "+tostring(n)+"): Death by lack of item")
     end
   end
 end
