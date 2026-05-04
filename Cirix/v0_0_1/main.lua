@@ -425,13 +425,12 @@ function compress(nam, n)
 
   -- Add input
   if(nam == "Advanced Coke Oven Brick (Block)") then
-    sel(findItem("Advanced Coke Oven Brick (Brick)"))
-    for i=1,4*n do
-      robot.drop(1)
-      if(not ic.getStackInInternalSlot(selectedSlot)) then  -- Check if there are items left
-        sel(findItem("Advanced Coke Oven Brick (Brick)"))  -- Select a new item stack
-      end
+    for i=1,(4*n)//64 do
+      sel(findItem("Advanced Coke Oven Brick (Brick)"))
+      robot.drop(64)
     end
+    sel(findItem("Advanced Coke Oven Brick (Brick)"))
+    robot.drop((4*n) - (64 * ((4*n)//64)))
   end
 
   -- Go to output
@@ -441,6 +440,7 @@ function compress(nam, n)
   d()
 
   -- Start cycle
+  refreshInventory()
   sel(findItem("Vajra"))
   equip()
   sel(findItem("Hopper"))
