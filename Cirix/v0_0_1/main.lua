@@ -96,6 +96,9 @@ local craftingData = {
   },
   ["Oak Planks"] = {
     {"Oak Log", 2}
+  },
+  ["Coke Oven Brick (Block)"] = {
+    {"Coke Oven Brick", 4}
   }
 }
 
@@ -131,7 +134,18 @@ function findItem(targetName)
       return slot
     end
   end
-  return nil
+
+  if(canCraft(targetName)) then
+    craft(targetName, nil, 1)
+  end
+
+  -- Try again after crafting the item
+  local size = inv()
+  for slot = 1, size do
+    if matches(getSlot(slot), targetName) then
+      return slot
+    end
+  end
 end
 
 -- Has item
@@ -188,7 +202,7 @@ end
 -- Can craft item
 function canCraft(name)
   -- Find the multi in data
-  for _, req in ipairs(craftingData[tmp]) do
+  for _, req in ipairs(craftingData[name]) do
     local item, count = req[1], req[2]
     if countItem(item) < count then
       return false
