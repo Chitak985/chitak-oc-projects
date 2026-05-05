@@ -16,7 +16,7 @@ function ta()robot.turnAround()end
 function getSlot(n)return ic.getStackInInternalSlot(n)end
 function inv()return robot.inventorySize()end
 function swapTo(n,n2)robot.transferTo(n,n2)end
-function sel(n)robot.select(n)end
+function sel(n)return robot.select(n)end
 function place()robot.place()end
 function placeU()robot.placeUp()end
 function placeD()robot.placeDown()end
@@ -29,16 +29,18 @@ function equip()ic.equip()end
 -- Special items (mutiple items with the same display name)
 local itemMap = {
   ["Coke Oven Brick (Block)"] = {
-    {label="Coke Oven Brick", name="Railcraft:machine.alpha"}
+    label="Coke Oven Brick",
+    name="Railcraft:machine.alpha"
   },
   ["Coke Oven Brick (Brick)"] = {
-    {name="dreamcraft:item.CokeOvenBrick"}
+    name="dreamcraft:item.CokeOvenBrick"
   },
   ["Advanced Coke Oven Brick (Block)"] = {
-    {label="Advanced Coke Oven Brick", name="Railcraft:machine.alpha"}
+    label="Advanced Coke Oven Brick",
+    name="Railcraft:machine.alpha"
   },
   ["Advanced Coke Oven Brick (Brick)"] = {
-    {name="dreamcraft:item.AdvancedCokeOvenBrick"}
+    name="dreamcraft:item.AdvancedCokeOvenBrick"
   }
 }
 -- Multiblock construction requirements (mostly used by canBuild())
@@ -101,67 +103,82 @@ local craftingData = {
   }
 }
 
------ HELPER ITEM OPERATIONS -----
------ ITEM MATCHING -----
-function matches(stack, targetName)
-  if not stack then return false end
+----- INVENTORY -----
+function findItem(name)  -- Find an item in the inventory
+  local mapEntry = itemMap[name]  -- Get the entry in the special items, nil if it is not a special item
+  local currentInv = inv()  -- Get the current inventory state
 
-  local defs = itemMap[targetName]
+  for slot = 1, currentInv do  -- Iterate through the inventory
+    local item = getSlot(slot)  -- Get item in the slot, nil if the slot is empty
 
-  if defs then
-    for _, def in ipairs(defs) do
-      local labelMatch = (not def.label) or (stack.label == def.label)
-      local nameMatch  = (not def.name)  or (stack.name  == def.name)
-      if labelMatch and nameMatch then return true end
+    if item then  -- Make sure slot is not empty
+      if mapEntry then  -- Only run if special item
+        if mapEntry.label then  -- If it has a display name (.label), the item's internal name is duplicated somewhere
+          if item.label == mapEntry.label and item.name == mapEntry.name then
+            return slot
+          end
+        else  -- Normal special item handling, use internal name instead of display name
+          if item.name == mapEntry.name then
+            return slot
+          end
+        end
+      else  -- Normal item handling, use display name
+        if item.label == name then
+          return slot
+        end
+      end
     end
-    return false
   end
 
-  return stack.label == targetName
-end
-
------ BASIC INVENTORY -----
-function findItem(name)
-  for slot = 1, inv() do
-    if matches(getSlot(slot), name) then
-      return slot
-    end
-  end
   return nil
 end
 
 function countItem(name)
   local total = 0
-  for slot = 1, inv() do
-    local stack = getSlot(slot)
-    if matches(stack, name) then
-      total = total + stack.size
+  local mapEntry = itemMap[name]  -- Get the entry in the special items, nil if it is not a special item
+  local currentInv = inv()  -- Get the current inventory state
+
+  for slot = 1, currentInv do  -- Iterate through the inventory
+    local item = getSlot(slot)  -- Get item in the slot, nil if the slot is empty
+
+    if item then  -- Make sure slot is not empty
+      if mapEntry then  -- Only run if special item
+        if mapEntry.label then  -- If it has a display name (.label), the item's internal name is duplicated somewhere
+          if item.label == mapEntry.label and item.name == mapEntry.name then
+            total = total + item.size
+          end
+        else  -- Normal special item handling, use internal name instead of display name
+          if item.name == mapEntry.name then
+            total = total + item.size
+          end
+        end
+      else  -- Normal item handling, use display name
+        if item.label == name then
+          total = total + item.size
+        end
+      end
     end
   end
+
   return total
 end
 
 function hasItem(name)
-  return countItem(name) > 0
+  return findItem(name) ~= nil
 end
 
------ SAFE SELECT -----
 function selectItem(name)
-  if not ensureItem(name, 1) then
-    error("Missing item: " .. tostring(name))
-  end
-
   local slot = findItem(name)
   if not slot then
-    error("Item vanished: " .. tostring(name))
+    print("selectItem("..tostring(name).."): Item not found: "..tostring(name))
+    return nil
   end
-
-  sel(slot)
-  return slot
+  return sel(slot)
 end
 
 ----- ENSURE ITEM (CRAFTING CORE) -----
 function ensureItem(name, amount)
+  print("ensureItem("..tostring(name)..", "..tostring(amount)..") called!")
   amount = amount or 1
 
   if countItem(name) >= amount then
@@ -197,7 +214,6 @@ function ensureItem(name, amount)
   return true
 end
 
-
 ----- HELPER FUNCTIONS -----
 -- Select empty
 function unequip()
@@ -207,6 +223,7 @@ function unequip()
       break
     end
   end
+  print("unequip(): No slots left!")
   -- TODO: Failsafe if no slots left
 end
 
@@ -232,51 +249,33 @@ end
 -- Singleblock setup
 function setupMachine(machine, tier)
   if(machine == "Compressor") then
-    if(tier == "LV" or tier == "ULV") then
-      f()
-      selectItem(("Dirt"))
-      place()
-      b()
-      selectItem(("Hopper"))
+    if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
+      selectItem("Dirt")
       place()
       u()
-      f()
-      selectItem(("Basic Solar Panel"))
+      selectItem("Basic Solar Panel")
       place()
       b()
-      selectItem(("Basic Compressor"))
+      selectItem("Basic Compressor")
       place()
-      tr()
-      f()
-      tl()
-      selectItem(("Hopper"))
-      place()
-      tl()
-      f()
-      tr()
       d()
+      selectItem("Hopper")
+      placeU()  -- End under the input hopper (1 block back)
     end
   end
 end
 
 -- Singleblock dismantle
 function dismantleMachine(machine)
-  if(machine == "Compressor") then
-    sel(findItem("Vajra"))
+  if(machine == "Compressor") then  -- Must start under the input hopper
+    selectItem("Vajra")
     equip()
-    u()
+    swingU()
+    f()
+    swingU()
     swing()
     f()
-    swingD()
-    swing()
-    tr()
-    swing()
-    tl()
-    f()
-    swingD()
-    d()
-    b()
-    b()
+    swingU()  -- End where the dirt was (1 block forward from the compressor, 2 forward from input hopper)
   end
 end
 
@@ -299,44 +298,47 @@ end
 function setUpCrafting(name, material)
   -- TODO: Use tables for crafting layouts
   if(name == "Hammer") then
-    selectItem(("Iron Ingot"))
+    selectItem("Iron Ingot")
     swapTo(1, 1)
     swapTo(2, 1)
     swapTo(5, 1)
     swapTo(6, 1)
     swapTo(9, 1)
     swapTo(10, 1)
-    selectItem(("Stick"))
+    selectItem("Stick")
     swapTo(7, 1)
   end
   if(name == "Wrench") then
-    selectItem(("Iron Ingot"))
+    selectItem("Iron Ingot")
     swapTo(1, 1)
     swapTo(3, 1)
     swapTo(5, 1)
     swapTo(6, 1)
     swapTo(7, 1)
     swapTo(10, 1)
-    selectItem(("Hammer"))
+    selectItem("Hammer")
     swapTo(2, 1)
   end
   if(name == "Coke Oven Brick (Block)") then
-    selectItem(("Coke Oven Brick (Brick)"))
+    selectItem("Coke Oven Brick (Brick)")
     swapTo(1, 1)
     swapTo(2, 1)
     swapTo(5, 1)
     swapTo(6, 1)
   end
   if(name == "Stick") then
-    selectItem(("Oak Planks"))
+    selectItem("Oak Planks")
     swapTo(1, 1)
-    swapTo(2, 1)
+    swapTo(5, 1)
   end
   if(name == "Oak Planks") then
-    selectItem(("Oak Log"))
+    selectItem("Oak Log")
     swapTo(1, 1)
   end
+
+  -- Obsolete
   if(name == "2x2") then
+    print("2x2 crafting pattern called!")
     selectItem(material)
     swapTo(1, 1)
     swapTo(2, 1)
@@ -344,20 +346,24 @@ function setUpCrafting(name, material)
     swapTo(6, 1)
   end
   if(name == "1x1") then
+    print("1x1 crafting pattern called!")
     selectItem(material)
     swapTo(1, 1)
   end
   if(name == "1x2") then
+    print("1x2 crafting pattern called!")
     selectItem(material)
     swapTo(1, 1)
     swapTo(2, 1)
   end
 end
-
------ SIMPLE CRAFT WRAPPER -----
 function craft(name, _, amount)
   amount = amount or 1
-  return ensureItem(name, amount)
+  for i = 1,amount,1 do
+    clearForCrafting()
+    setUpCrafting(name)
+    cr.craft(1)
+  end
 end
 
 -- Compressing
@@ -365,35 +371,22 @@ function compress(nam, n)
   setupMachine("Compressor", "ULV")  -- TODO: Add handling to use compressors from other tiers
   local checks = 0
 
-  -- Go to input
-  u()
-  tr()
-  f()
-  tl()
-
   -- Add input
   if(nam == "Advanced Coke Oven Brick (Block)") then
     for i=1,(4*n)//64 do
       selectItem("Advanced Coke Oven Brick (Brick)")
-      robot.drop(64)
+      robot.dropUp(64)
     end
     selectItem("Advanced Coke Oven Brick (Brick)")
-    robot.drop((4*n) - (64 * ((4*n)//64)))
+    robot.dropUp((4*n) - (64 * ((4*n)//64)))
   end
 
   -- Go to output
-  tl()
   f()
-  tr()
-  d()
 
   -- Start cycle
-  selectItem("Vajra")
-  equip()
-  selectItem("Hopper")
   while true do
-    robot.swing()
-    robot.place()
+    robot.suckUp()
     checks = checks + 1
     if checks % 10 == 0 then  -- refresh every 10 cycles
       if(countItem(nam) >= n) then
@@ -402,6 +395,9 @@ function compress(nam, n)
     end
   end
 
+  -- Go to input
+  b()
+  
   -- Finish
   dismantleMachine("Compressor")
 end
@@ -826,13 +822,29 @@ end
 if(hasItem("Dimensionally Transcendent Plasma Forge")) then
   ovens()
 else
-  ensureItem("Wrench", 1)
-  if(countItem("Coke Oven Brick (Block)") < 26) then
-    craft("Coke Oven Brick (Block)","Coke Oven Brick (Brick)",26)
+  cokeOvenBlocks = countItem("Coke Oven Brick (Block)")
+  advCokeOvenBlocks = countItem("Advanced Coke Oven Brick (Block)")
+
+  if not hasItem("Wrench") then
+    if not hasItem("Hammer") then
+      if not hasItem("Stick") then
+        if not hasItem("Oak Planks") then
+          craft("Oak Planks")
+        end
+        craft("Stick")
+      end
+      craft("Hammer")
+    end
+    craft("Wrench")
   end
-  if(countItem("Advanced Coke Oven Brick (Block)") < 34) then
-    compress("Advanced Coke Oven Brick (Block)",34)
+  
+  if(cokeOvenBlocks < 26) then
+    craft("Coke Oven Brick (Block)","Coke Oven Brick (Brick)", 26-cokeOvenBlocks)
   end
+  if(advCokeOvenBlocks < 34) then
+    compress("Advanced Coke Oven Brick (Block)", 34-advCokeOvenBlocks)
+  end
+  
   tr()
   f()
   f()
