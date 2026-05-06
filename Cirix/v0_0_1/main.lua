@@ -208,14 +208,13 @@ end
 
 ----- HELPER FUNCTIONS -----
 -- Select empty
-function unequip()
+function unselect()
   for slot = 1,inv(),1 do
     if getSlot(slot) == nil then
       sel(slot)
       break
     end
   end
-  print("unequip(): No slots left!")
   -- TODO: Failsafe if no slots left
 end
 
@@ -619,7 +618,7 @@ function buildEBF() --Using old code because new doesn't work
   selectItem(("Wrench"))
   equip()
   robot.useDown(1)
-  unequip()
+  unselect()
   equip()
   b()
   d()
@@ -646,7 +645,7 @@ function buildEBF() --Using old code because new doesn't work
   selectItem(("BrainTech Aerospace Advanced Reinforced Duct Tape FAL-84"))
   equip()
   robot.use(2)
-  unequip()
+  unselect()
   equip()
   tl()
   f()
@@ -709,13 +708,13 @@ function buildSteamGrinder(tier)
   place()
   tr()
   b()
-  selectItem(("Steam Grinder"))
+  selectItem("Steam Grinder")
   place()
   u()
   if(tier == 1) then
-    selectItem(("Bronze Plated Bricks"))
+    selectItem("Bronze Plated Bricks")
   elseif(tier == 2) then
-    selectItem(("Solid Steel Machine Casing"))
+    selectItem("Solid Steel Machine Casing")
   end
   square3()
   d()
@@ -723,9 +722,9 @@ function buildSteamGrinder(tier)
 end
 function buildSteamSquasher(tier)
   if(tier == 1) then
-    selectItem(("Bronze Plated Bricks"))
+    selectItem("Bronze Plated Bricks")
   elseif(tier == 2) then
-    selectItem(("Solid Steel Machine Casing"))
+    selectItem("Solid Steel Machine Casing")
   end
   f()
   f()
@@ -823,7 +822,6 @@ posZ = 0
 rotation = 1
 
 -- Movement Functions
---TODO: Add failsafes to movement and other functions
 function f()  -- Forward
   if robot.forward() then
     if(rotation == 1) then
@@ -881,7 +879,7 @@ end
 -- Return to the 0,0,0 position (origin)
 --First matches y, then x, then z
 function origin()
-  unequip()
+  unselect()
   equip()
   selectItem("Vajra")
   equip()
@@ -946,7 +944,7 @@ end
 
 -- Mine down until cannot
 function mineUntilBlock()
-  unequip()
+  unselect()
   equip()
   selectItem("Vajra")
   equip()
@@ -1040,20 +1038,33 @@ else
   selectItem("Vajra")
   equip()
   mineUntilBlock()
+  u()
+  u()
+  u()
+  u()
+  u()
   for ix=1,10,1 do
     for iz=1,10,1 do
       robot.swing()
       f()
     end
+    ta()
     for iz=1,10,1 do
-      b()
+      robot.swing()
+      f()
     end
-    tr()
+    tl()
     robot.swing()
     f()
     tl()
   end
   origin()
   face(1)
+  if not robot.detect() then
+    if hasItem("Gold Chest") then
+      selectItem("Gold Chest")
+      place()
+    end
+  end
   unloadAll()
 end
