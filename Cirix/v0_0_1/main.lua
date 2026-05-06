@@ -825,58 +825,56 @@ rotation = 1
 -- Movement Functions
 --TODO: Add failsafes to movement and other functions
 function f()  -- Forward
-  robot.forward()
-  if(rotation == 1) then
-    posZ = posZ + 1
-  elseif(rotation == 2) then
-    posX = posX + 1
-  elseif(rotation == 3) then
-    posZ = posZ - 1
-  elseif(rotation == 4) then
-    posX = posX - 1
+  if robot.forward() then
+    if(rotation == 1) then
+      posZ = posZ + 1
+    elseif(rotation == 2) then
+      posX = posX + 1
+    elseif(rotation == 3) then
+      posZ = posZ - 1
+    elseif(rotation == 4) then
+      posX = posX - 1
+    end
   end
 end
 function b()  -- Back
-  robot.back()
-  if(rotation == 1) then
-    posZ = posZ - 1
-  elseif(rotation == 2) then
-    posX = posX - 1
-  elseif(rotation == 3) then
-    posZ = posZ + 1
-  elseif(rotation == 4) then
-    posX = posX + 1
+  if robot.back() then
+    if(rotation == 1) then
+      posZ = posZ - 1
+    elseif(rotation == 2) then
+      posX = posX - 1
+    elseif(rotation == 3) then
+      posZ = posZ + 1
+    elseif(rotation == 4) then
+      posX = posX + 1
+    end
   end
 end
 function u()  -- Up
-  robot.up()
-  posY = posY + 1
+  if robot.up() then
+    posY = posY + 1
+  end
 end
 function d()  -- Down
-  robot.down()
-  posY = posY - 1
+  if robot.down() then
+    posY = posY - 1
+  end
 end
 function tr()  -- Turn Right
   robot.turnRight()
-  rotation = rotation + 1
-  if(rotation == 5) then
-    rotation = 1
-  end
+  rotation = (rotation % 4) + 1
 end
 function tl()  -- Turn Left
   robot.turnLeft()
-  rotation = rotation - 1
-  if(rotation == 0) then
-    rotation = 4
-  end
+  rotation = (rotation - 2) % 4 + 1
 end
 function ta()  -- Turn Around
   robot.turnAround()
-  rotation = rotation + 2
-  if(rotation == 5) then
-    rotation = 1
-  elseif(rotation == 6) then
-    rotation = 2
+  rotation = (rotation + 1) % 4 + 1
+end
+function face(dir)  -- Face a direction
+  while rotation ~= dir do
+    tr()
   end
 end
 
@@ -889,26 +887,24 @@ function origin()
   equip()
   -- Y -> 0
   while posY > 0 do
-    if robot.detectDown()[0] then
+    if robot.detectDown() then
       robot.swingDown()
     end
     d()
   end
   while posY < 0 do
-    if robot.detectUp()[0] then
+    if robot.detectUp() then
       robot.swingUp()
     end
     u()
   end
   
   -- Face towards X+
-  while rotation != 2 do
-    tr()
-  end
+  face(2)
   
   -- X -> 0 (negative)
   while posX < 0 do
-    if robot.detect()[0] then
+    if robot.detect() then
       robot.swing()
     end
     f()
@@ -919,7 +915,7 @@ function origin()
   
   -- X -> 0 (positive)
   while posX > 0 do
-    if robot.detect()[0] then
+    if robot.detect() then
       robot.swing()
     end
     f()
@@ -930,7 +926,7 @@ function origin()
   
   -- X -> 0 (negative)
   while posZ < 0 do
-    if robot.detect()[0] then
+    if robot.detect() then
       robot.swing()
     end
     f()
@@ -941,10 +937,24 @@ function origin()
   
   -- X -> 0 (positive)
   while posZ > 0 do
-    if robot.detect()[0] then
+    if robot.detect() then
       robot.swing()
     end
     f()
+  end
+end
+
+-- Mine down until cannot
+function mineUntilBlock()
+  unequip()
+  equip()
+  selectItem("Vajra")
+  equip()
+  while robot.swingDown() do
+    if robot.detectDown() then
+      robot.swingDown()
+    end
+    d()
   end
 end
 
@@ -1018,4 +1028,19 @@ else
   place()
   selectItem("Vajra")
   equip()
+  mineUntilBlock()
+  for ix=1,25,1 do
+    for iz=1,25,1 do
+      robot.swing()
+      f()
+    end
+    for iz=1,25,1 do
+      b()
+    end
+    tr()
+    robot.swing()
+    f()
+    tl()
+  end
+  origin()
 end
