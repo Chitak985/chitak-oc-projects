@@ -5,14 +5,6 @@ local ic = component.inventory_controller
 local cr = component.crafting
 
 ----- SHORTENED FUNCTIONS -----
--- TODO: Add failsafes to movement and other functions
-function f()robot.forward()end
-function b()robot.back()end
-function u()robot.up()end
-function d()robot.down()end
-function tr()robot.turnRight()end
-function tl()robot.turnLeft()end
-function ta()robot.turnAround()end
 function getSlot(n)return ic.getStackInInternalSlot(n)end
 function inv()return robot.inventorySize()end
 function swapTo(n,n2)robot.transferTo(n,n2)end
@@ -818,10 +810,148 @@ function ovens()
   end
 end
 
+----- NAVIGATION -----
+-- Data
+--Rotation:
+--  Z
+--  1
+--4   2 X
+--  3
+posX = 0
+posY = 0
+posZ = 0
+rotation = 1
+
+-- Movement Functions
+--TODO: Add failsafes to movement and other functions
+function f()  -- Forward
+  robot.forward()
+  if(rotation == 1) then
+    posZ = posZ + 1
+  elseif(rotation == 2) then
+    posX = posX + 1
+  elseif(rotation == 3) then
+    posZ = posZ - 1
+  elseif(rotation == 4) then
+    posX = posX - 1
+  end
+end
+function b()  -- Back
+  robot.back()
+  if(rotation == 1) then
+    posZ = posZ - 1
+  elseif(rotation == 2) then
+    posX = posX - 1
+  elseif(rotation == 3) then
+    posZ = posZ + 1
+  elseif(rotation == 4) then
+    posX = posX + 1
+  end
+end
+function u()  -- Up
+  robot.up()
+  posY = posY + 1
+end
+function d()  -- Down
+  robot.down()
+  posY = posY - 1
+end
+function tr()  -- Turn Right
+  robot.turnRight()
+  rotation = rotation + 1
+  if(rotation == 5) then
+    rotation = 1
+  end
+end
+function tl()  -- Turn Left
+  robot.turnLeft()
+  rotation = rotation - 1
+  if(rotation == 0) then
+    rotation = 4
+  end
+end
+function ta()  -- Turn Around
+  robot.turnAround()
+  rotation = rotation + 2
+  if(rotation == 5) then
+    rotation = 1
+  elseif(rotation == 6) then
+    rotation = 2
+  end
+end
+
+-- Return to the 0,0,0 position (origin)
+--First matches y, then x, then z
+function origin()
+  unequip()
+  equip()
+  selectItem("Vajra")
+  equip()
+  -- Y -> 0
+  while posY > 0 do
+    if robot.detectDown()[0] then
+      robot.swingDown()
+    end
+    d()
+  end
+  while posY < 0 do
+    if robot.detectUp()[0] then
+      robot.swingUp()
+    end
+    u()
+  end
+  
+  -- Face towards X+
+  while rotation != 2 do
+    tr()
+  end
+  
+  -- X -> 0 (negative)
+  while posX < 0 do
+    if robot.detect()[0] then
+      robot.swing()
+    end
+    f()
+  end
+  
+  -- Face towards X-
+  ta()
+  
+  -- X -> 0 (positive)
+  while posX > 0 do
+    if robot.detect()[0] then
+      robot.swing()
+    end
+    f()
+  end
+  
+  -- Face towards Z+
+  tr()
+  
+  -- X -> 0 (negative)
+  while posZ < 0 do
+    if robot.detect()[0] then
+      robot.swing()
+    end
+    f()
+  end
+  
+  -- Face towards Z-
+  ta()
+  
+  -- X -> 0 (positive)
+  while posZ > 0 do
+    if robot.detect()[0] then
+      robot.swing()
+    end
+    f()
+  end
+end
+
 ----- MAIN CODE -----
 if(hasItem("Dimensionally Transcendent Plasma Forge")) then
   ovens()
-else
+elseif(hasItem("Electric Blast Furnace")) then
   cokeOvenBlocks = countItem("Coke Oven Brick (Block)")
   advCokeOvenBlocks = countItem("Advanced Coke Oven Brick (Block)")
 
@@ -883,4 +1013,9 @@ else
   f()
   f()
   tr()
+else
+  selectItem("Gold Chest")
+  place()
+  selectItem("Vajra")
+  equip()
 end
