@@ -950,11 +950,22 @@ function mineUntilBlock()
   equip()
   selectItem("Vajra")
   equip()
-  while robot.swingDown() do
-    if robot.detectDown() then
-      robot.swingDown()
+  while true do
+    if not robot.swingDown() then
+      if robot.detectDown() then
+        break
+      end
     end
     d()
+  end
+end
+
+-- Unload items
+function unloadAll()
+  local currentInv = inv()  -- Get the current inventory state
+  for slot = 1, currentInv do  -- Iterate through the inventory
+    robot.select(slot)
+    robot.drop()
   end
 end
 
@@ -1029,12 +1040,12 @@ else
   selectItem("Vajra")
   equip()
   mineUntilBlock()
-  for ix=1,25,1 do
-    for iz=1,25,1 do
+  for ix=1,10,1 do
+    for iz=1,10,1 do
       robot.swing()
       f()
     end
-    for iz=1,25,1 do
+    for iz=1,10,1 do
       b()
     end
     tr()
@@ -1043,4 +1054,6 @@ else
     tl()
   end
   origin()
+  face(1)
+  unloadAll()
 end
