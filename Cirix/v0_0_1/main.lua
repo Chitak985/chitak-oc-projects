@@ -965,11 +965,13 @@ end
 
 -- Move forward on land
 function fTerrestrial()
+  print("Moving down")
   -- Move down to find the lowest point to continue from
   while not robot.detectDown() do
     robot.down()
   end
 
+  print("Moving up")
   -- Move up until can move forward
   while robot.detect() do
     if robot.detectUp() then  -- If hit a ceiling, mine through
@@ -978,6 +980,8 @@ function fTerrestrial()
     robot.up()
   end
 
+  print("Moving forward")
+  
   -- Move forward when all is clear
   robot.forward()  
 end
@@ -1000,15 +1004,12 @@ function selectFiller()
     if lastFillerData then  -- If there are still items in the stack
       if lastFillerData.name ~= "minecraft:cobblestone" then  -- If it is no longer the filler
         setFillerSlot()  -- Select a new filler (slot no longer has the filler)
-        print("Filler slot no longer contains filler")
       end
     else
       setFillerSlot()  -- Select a new filler (slot is empty)
-      print("Filler slot is empty")
     end
   else
     setFillerSlot()  -- Select a new filler (no filler selected)
-    print("No filler slot selected")
   end
 end
 
@@ -1020,11 +1021,7 @@ function findBlock(blockName)
   selectItem("Vajra")
   equip()
   while not hasItem(blockName) do
-    print("Selecting filler")
-    
     selectFiller()
-
-    print("Done selecting filler")
 
     if lastFillerSlot then  -- Does the robot have an active filler
       if not robot.compareDown() then
@@ -1038,8 +1035,6 @@ function findBlock(blockName)
       -- However, this will make the robot go down and up uselessly later
       robot.swingDown()
     end
-
-    print("Moving")
 
     fTerrestrial()
   end
