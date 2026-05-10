@@ -958,6 +958,25 @@ function mineUntilBlock()
   end
 end
 
+-- Move forward on land
+function fTerrestrial()
+  -- Move down to find the lowest point to continue from
+  while not robot.detectDown() do
+    robot.down()
+  end
+
+  -- Move up until can move forward
+  while robot.detect() do
+    robot.up()
+    if not detectUpPassFluid() then  -- If hit a ceiling, mine through
+      robot.swingUp()
+    end
+  end
+
+  -- Move forward when all is clear
+  robot.forward()  
+end
+
 -- Unload items
 function unloadAll()
   local currentInv = inv()  -- Get the current inventory state
