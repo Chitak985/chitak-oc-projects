@@ -965,13 +965,6 @@ end
 
 -- Move forward on land
 function fTerrestrial()
-  print("Moving down")
-  -- Move down to find the lowest point to continue from
-  while robot.down() do
-    
-  end
-
-  print("Moving up")
   -- Move up until can move forward
   while robot.detect() do
     if robot.detectUp() then  -- If hit a ceiling, mine through
@@ -980,10 +973,13 @@ function fTerrestrial()
     robot.up()
   end
 
-  print("Moving forward")
-  
   -- Move forward when all is clear
-  robot.forward()  
+  robot.forward()
+
+  -- Move down to find the lowest point to continue from
+  while not robot.detectDown() do
+    robot.down()
+  end
 end
 
 -- Select a new filler block to use
