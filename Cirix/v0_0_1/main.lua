@@ -967,8 +967,8 @@ end
 function fTerrestrial()
   print("Moving down")
   -- Move down to find the lowest point to continue from
-  while not robot.detectDown() do
-    robot.down()
+  while robot.down() do
+    
   end
 
   print("Moving up")
