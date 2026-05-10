@@ -1000,12 +1000,15 @@ function selectFiller()
     if lastFillerData then  -- If there are still items in the stack
       if lastFillerData.name ~= "minecraft:cobblestone" then  -- If it is no longer the filler
         setFillerSlot()  -- Select a new filler (slot no longer has the filler)
+        print("Filler slot no longer contains filler")
       end
     else
       setFillerSlot()  -- Select a new filler (slot is empty)
+      print("Filler slot is empty")
     end
   else
     setFillerSlot()  -- Select a new filler (no filler selected)
+    print("No filler slot selected")
   end
 end
 
@@ -1017,7 +1020,11 @@ function findBlock(blockName)
   selectItem("Vajra")
   equip()
   while not hasItem(blockName) do
+    print("Selecting filler")
+    
     selectFiller()
+
+    print("Done selecting filler")
 
     if lastFillerSlot then  -- Does the robot have an active filler
       if not robot.compareDown() then
@@ -1031,6 +1038,8 @@ function findBlock(blockName)
       -- However, this will make the robot go down and up uselessly later
       robot.swingDown()
     end
+
+    print("Moving")
 
     fTerrestrial()
   end
