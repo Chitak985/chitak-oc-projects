@@ -970,15 +970,15 @@ function fTerrestrial()
     if robot.detectUp() then  -- If hit a ceiling, mine through
       robot.swingUp()
     end
-    robot.up()
+    u()
   end
 
   -- Move forward when all is clear
-  robot.forward()
+  f()
 
   -- Move down to find the lowest point to continue from
   while not robot.detectDown() do
-    robot.down()
+    d()
   end
 end
 
