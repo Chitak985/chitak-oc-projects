@@ -972,10 +972,10 @@ function fTerrestrial()
 
   -- Move up until can move forward
   while robot.detect() do
-    robot.up()
     if robot.detectUp() then  -- If hit a ceiling, mine through
       robot.swingUp()
     end
+    robot.up()
   end
 
   -- Move forward when all is clear
@@ -986,7 +986,7 @@ end
 function setFillerSlot()
   if hasItem("Cobblestone") then
     lastFillerSlot = findItem("Cobblestone")
-    sel(slotN)  -- Not using selectItem since the item is checked to exist and this would run findItem twice
+    sel(lastFillerSlot)  -- Not using selectItem since the item is checked to exist and this would run findItem twice
   else
     -- Set filler slot to nothing to indicate that there is no cobblestone left
     lastFillerSlot = nil
@@ -998,7 +998,7 @@ function selectFiller()
   if lastFillerSlot then  -- If there was a filler already selected
     local lastFillerData = getSlot(lastFillerSlot)  -- Update stack data
     if lastFillerData then  -- If there are still items in the stack
-      if not lastFillerData.name == "minecraft:cobblestone" then  -- If it is no longer the filler
+      if lastFillerData.name ~= "minecraft:cobblestone" then  -- If it is no longer the filler
         setFillerSlot()  -- Select a new filler (slot no longer has the filler)
       end
     else
@@ -1011,7 +1011,11 @@ end
 
 -- Find block in world
 --Cobblestone is used as a filler block
-function findBlock(blockName)  
+function findBlock(blockName)
+  unselect()
+  equip()
+  selectItem("Vajra")
+  equip()
   while not hasItem(blockName) do
     selectFiller()
 
@@ -1107,38 +1111,6 @@ elseif(hasItem("Electric Blast Furnace")) then
   f()
   tr()
 else
-  selectItem("Gold Chest")
-  place()
-  selectItem("Vajra")
-  equip()
-  mineUntilBlock()
-  u()
-  u()
-  u()
-  u()
-  u()
-  for ix=1,10,1 do
-    for iz=1,10,1 do
-      robot.swing()
-      f()
-    end
-    ta()
-    for iz=1,10,1 do
-      robot.swing()
-      f()
-    end
-    tl()
-    robot.swing()
-    f()
-    tl()
-  end
+  findBlock("Sand")
   origin()
-  face(1)
-  if not robot.detect() then
-    if hasItem("Gold Chest") then
-      selectItem("Gold Chest")
-      place()
-    end
-  end
-  unloadAll()
 end
