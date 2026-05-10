@@ -1,8 +1,13 @@
 -- wget https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/main.lua && main
+
+----- IMPORTS -----
 local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
+
+----- VARIABLES -----
+lastFillerSlot = nil  -- Slot of the last filler block (cobblestone)
 
 ----- SHORTENED FUNCTIONS -----
 function getSlot(n)return ic.getStackInInternalSlot(n)end
@@ -968,13 +973,63 @@ function fTerrestrial()
   -- Move up until can move forward
   while robot.detect() do
     robot.up()
-    if not detectUpPassFluid() then  -- If hit a ceiling, mine through
+    if robot.detectUp() then  -- If hit a ceiling, mine through
       robot.swingUp()
     end
   end
 
   -- Move forward when all is clear
   robot.forward()  
+end
+
+-- Select a new filler block to use
+function setFillerSlot()
+  if hasItem("Cobblestone") then
+    lastFillerSlot = findItem("Cobblestone")
+    sel(slotN)  -- Not using selectItem since the item is checked to exist and this would run findItem twice
+  else
+    -- Set filler slot to nothing to indicate that there is no cobblestone left
+    lastFillerSlot = nil
+  end
+end
+
+-- Selects a new filler, lastFillerSlot would become nil if this failed
+function selectFiller()
+  if lastFillerSlot then  -- If there was a filler already selected
+    local lastFillerData = getSlot(lastFillerSlot)  -- Update stack data
+    if lastFillerData then  -- If there are still items in the stack
+      if not lastFillerData.name == "minecraft:cobblestone" then  -- If it is no longer the filler
+        setFillerSlot()  -- Select a new filler (slot no longer has the filler)
+      end
+    else
+      setFillerSlot()  -- Select a new filler (slot is empty)
+    end
+  else
+    setFillerSlot()  -- Select a new filler (no filler selected)
+  end
+end
+
+-- Find block in world
+--Cobblestone is used as a filler block
+function findBlock(blockName)  
+  while not hasItem(blockName) do
+    selectFiller()
+
+    if lastFillerSlot then  -- Does the robot have an active filler
+      if not robot.compareDown() then
+        -- If the block isn't a filler, get it and put down the filler
+        robot.swingDown()
+        robot.placeDown()
+      end
+      -- Otherwise do nothing and leave the filler where it is
+    else
+      -- Get whatever block is there and leave the space empty
+      -- However, this will make the robot go down and up uselessly later
+      robot.swingDown()
+    end
+
+    fTerrestrial()
+  end
 end
 
 -- Unload items
