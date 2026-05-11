@@ -945,6 +945,13 @@ function origin()
   equip()
   selectItem("Vajra")
   equip()
+
+  -- Avoid the chest by not mining straight through it
+  --This is only an issue when coming from above to below
+  if (posX == 0) and (posZ == 0) and (posY > 0) then
+    f()
+  end
+  
   -- Y -> 0
   while posY > 0 do
     if robot.detectDown() then
