@@ -1074,7 +1074,7 @@ function findBlock(blockName)
   selectItem("Vajra")
   equip()
   while not hasItem(blockName) do
-    for i = 1,10 do  -- Only do hasItem checks every 10 blocks, saves on time
+    for i = 1,5 do  -- Only do hasItem checks every 5 blocks, saves on time
       selectFiller()
   
       if lastFillerSlot then  -- Does the robot have an active filler
@@ -1113,6 +1113,18 @@ function unloadAllNonTool()
       if (item.label ~= "Vajra") and (item.name ~= "minecraft:cobblestone") then
         robot.select(slot)
         robot.drop()
+      end
+    end
+  end
+end
+function unloadAllNonToolU()
+  local currentInv = inv()  -- Get the current inventory state
+  for slot = 1, currentInv do  -- Iterate through the inventory
+    local item = getSlot(slot)
+    if item then
+      if (item.label ~= "Vajra") and (item.name ~= "minecraft:cobblestone") then
+        robot.select(slot)
+        robot.dropUp()
       end
     end
   end
@@ -1201,24 +1213,40 @@ elseif(hasItem("Electric Blast Furnace")) then
   f()
   tr()
 else
+  selectItem("Cobblestone")
+  place()
+  u()
+  place()
+  d()
   selectItem("Gold Chest")
   placeU()
+  unselect()
+  equip()
+  selectItem("Vajra")
+  equip()
+  swing()
+  f()
+  swingU()
+  b()
   
   findBlock("Sand")
   origin()
-  unloadAllNonTool()
+  unloadAllNonToolU()
+  lastFillerSlot = nil
   
   findBlock("Sand")
   origin()
-  unloadAllNonTool()
+  unloadAllNonToolU()
+  lastFillerSlot = nil
   
   findBlock("Clay")
   origin()
-  unloadAllNonTool()
+  unloadAllNonToolU()
+  lastFillerSlot = nil
   
   findBlock("Clay")
   origin()
-  unloadAllNonTool()
+  unloadAllNonToolU()
 
   loadAllU()
   alloySmelt("Coke Oven Brick (Brick)", 4)
