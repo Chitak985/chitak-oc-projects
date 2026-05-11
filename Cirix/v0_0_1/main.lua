@@ -258,12 +258,35 @@ function setupMachine(machine, tier)
       selectItem("Hopper")
       placeU()  -- End under the input hopper (1 block back)
     end
+  elseif(machine == "Alloy Smelter") then
+    if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
+      selectItem("Dirt")
+      place()
+      u()
+      selectItem("Basic Solar Panel")
+      place()
+      b()
+      selectItem("Basic Alloy Smelter")
+      place()
+      d()
+      selectItem("Hopper")
+      placeU()  -- End under the input hopper (1 block back)
+    end
   end
 end
 
 -- Singleblock dismantle
 function dismantleMachine(machine)
   if(machine == "Compressor") then  -- Must start under the input hopper
+    selectItem("Vajra")
+    equip()
+    swingU()
+    f()
+    swingU()
+    swing()
+    f()
+    swingU()  -- End where the dirt was (1 block forward from the compressor, 2 forward from input hopper)
+  elseif(machine == "Alloy Smelter") then  -- Must start under the input hopper
     selectItem("Vajra")
     equip()
     swingU()
@@ -364,7 +387,7 @@ end
 
 -- Compressing
 function compress(nam, n)
-  setupMachine("Compressor", "ULV")  -- TODO: Add handling to use compressors from other tiers
+  setupMachine("Compressor", "ULV")  -- TODO: Add handling to use machines from other tiers
   local checks = 0
 
   -- Add input
@@ -396,6 +419,40 @@ function compress(nam, n)
   
   -- Finish
   dismantleMachine("Compressor")
+end
+
+-- Alloy Smelting
+function alloySmelt(nam, n)
+  setupMachine("Alloy Smelter", "ULV")  -- TODO: Add handling to use machines from other tiers
+  local checks = 0
+
+  -- Add input
+  if(nam == "Coke Oven Brick (Brick)") then
+    selectItem("Sand")
+    robot.dropUp(4 // 0.5)
+    selectItem("Clay")
+    robot.dropUp(4 // 0.5)
+  end
+
+  -- Go to output
+  f()
+
+  -- Start cycle
+  while true do
+    robot.suckUp()
+    checks = checks + 1
+    if checks % 10 == 0 then  -- refresh every 10 cycles
+      if(countItem(nam) >= n) then
+        break
+      end
+    end
+  end
+
+  -- Go to input
+  b()
+  
+  -- Finish
+  dismantleMachine("Alloy Smelter")
 end
 
 -- Construction
@@ -1017,22 +1074,24 @@ function findBlock(blockName)
   selectItem("Vajra")
   equip()
   while not hasItem(blockName) do
-    selectFiller()
-
-    if lastFillerSlot then  -- Does the robot have an active filler
-      if not robot.compareDown() then
-        -- If the block isn't a filler, get it and put down the filler
+    for i = 1,10 do  -- Only do hasItem checks every 10 blocks, saves on time
+      selectFiller()
+  
+      if lastFillerSlot then  -- Does the robot have an active filler
+        if not robot.compareDown() then
+          -- If the block isn't a filler, get it and put down the filler
+          robot.swingDown()
+          robot.placeDown()
+        end
+        -- Otherwise do nothing and leave the filler where it is
+      else
+        -- Get whatever block is there and leave the space empty
+        -- However, this will make the robot go down and up uselessly later
         robot.swingDown()
-        robot.placeDown()
       end
-      -- Otherwise do nothing and leave the filler where it is
-    else
-      -- Get whatever block is there and leave the space empty
-      -- However, this will make the robot go down and up uselessly later
-      robot.swingDown()
+  
+      fTerrestrial()
     end
-
-    fTerrestrial()
   end
 end
 
@@ -1042,6 +1101,37 @@ function unloadAll()
   for slot = 1, currentInv do  -- Iterate through the inventory
     robot.select(slot)
     robot.drop()
+  end
+end
+
+-- Unload items except the Vajra and fillers (cobblestone)
+function unloadAllNonTool()
+  local currentInv = inv()  -- Get the current inventory state
+  for slot = 1, currentInv do  -- Iterate through the inventory
+    local item = getSlot(slot)
+    if item then
+      if (item.label ~= "Vajra") and (item.name ~= "minecraft:cobblestone") then
+        robot.select(slot)
+        robot.drop()
+      end
+    end
+  end
+end
+
+-- Takes in everything
+function loadAllF()
+  while robot.suck() do
+
+  end
+end
+function loadAllU()
+  while robot.suckUp() do
+
+  end
+end
+function loadAllD()
+  while robot.suckDown() do
+
   end
 end
 
@@ -1111,6 +1201,27 @@ elseif(hasItem("Electric Blast Furnace")) then
   f()
   tr()
 else
+  selectItem("Gold Chest")
+  placeU()
+  
   findBlock("Sand")
   origin()
+  unloadAllNonTool()
+  
+  findBlock("Sand")
+  origin()
+  unloadAllNonTool()
+  
+  findBlock("Clay")
+  origin()
+  unloadAllNonTool()
+  
+  findBlock("Clay")
+  origin()
+  unloadAllNonTool()
+
+  loadAllU()
+  alloySmelt("Coke Oven Brick (Brick)", 4)
+
+  craft("Coke Oven Brick (Block)","Coke Oven Brick (Brick)", 1)
 end
