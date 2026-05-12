@@ -246,7 +246,7 @@ end
 function setupMachine(machine, tier)
   if(machine == "Compressor") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
-      selectItem("Dirt")
+      selectItem("Cobblestone")
       place()
       u()
       selectItem("Basic Solar Panel")
@@ -260,7 +260,7 @@ function setupMachine(machine, tier)
     end
   elseif(machine == "Alloy Smelter") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
-      selectItem("Dirt")
+      selectItem("Cobblestone")
       place()
       u()
       selectItem("Basic Solar Panel")
@@ -285,7 +285,7 @@ function dismantleMachine(machine)
     swingU()
     swing()
     f()
-    swingU()  -- End where the dirt was (1 block forward from the compressor, 2 forward from input hopper)
+    swingU()  -- End where the cobble was (1 block forward from the compressor, 2 forward from input hopper)
   elseif(machine == "Alloy Smelter") then  -- Must start under the input hopper
     selectItem("Vajra")
     equip()
@@ -294,7 +294,7 @@ function dismantleMachine(machine)
     swingU()
     swing()
     f()
-    swingU()  -- End where the dirt was (1 block forward from the compressor, 2 forward from input hopper)
+    swingU()  -- End where the cobble was (1 block forward from the compressor, 2 forward from input hopper)
   end
 end
 
