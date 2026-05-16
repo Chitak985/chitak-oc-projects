@@ -8,8 +8,7 @@ require("inventoryManager")
 require("crafting")
 require("building")
 
------ NAVIGATION -----
--- Data
+----- VARIABLES -----
 --Rotation:
 --  Z
 --  1
@@ -20,7 +19,7 @@ posY = 0
 posZ = 0
 rotation = 1
 
--- Movement Functions
+----- BASIC MOVEMENT -----
 function f()  -- Forward
   if robot.forward() then
     if(rotation == 1) then
@@ -75,6 +74,67 @@ function face(dir)  -- Face a direction
   end
 end
 
+----- SPECIAL MOVEMENT -----
+-- Move forward on land
+function fTerrestrial()
+  -- Move up until can move forward
+  while robot.detect() do
+    if robot.detectUp() then  -- If hit a ceiling, mine through
+      robot.swingUp()
+    end
+    u()
+  end
+
+  -- Move forward when all is clear
+  f()
+
+  -- Move down to find the lowest point to continue from
+  while not robot.detectDown() do
+    d()
+  end
+end
+
+----- SECTOR MOVEMENT -----
+function moveToNext3_3Side()
+  tl()
+  f()
+  f()
+  f()
+  f()
+  tr()
+end
+function moveToNext3_3Front()
+  tl()
+  f()
+  f()
+  tr()
+  f()
+  f()
+  f()
+  f()
+  f()
+  tr()
+  f()
+  f()
+  tl()
+end
+function moveToNext3_3Back()
+  tl()
+  f()
+  f()
+  tl()
+  f()
+  f()
+  f()
+  f()
+  f()
+  tl()
+  f()
+  f()
+  tl()
+end
+
+----- ORIGIN -----
 -- Return to the 0,0,0 position (origin)
 --First matches y, then x, then z
 function origin()
@@ -148,6 +208,7 @@ function origin()
   end
 end
 
+----- MINING -----
 -- Mine down until cannot
 function mineUntilBlock()
   unselect()
@@ -164,25 +225,7 @@ function mineUntilBlock()
   end
 end
 
--- Move forward on land
-function fTerrestrial()
-  -- Move up until can move forward
-  while robot.detect() do
-    if robot.detectUp() then  -- If hit a ceiling, mine through
-      robot.swingUp()
-    end
-    u()
-  end
-
-  -- Move forward when all is clear
-  f()
-
-  -- Move down to find the lowest point to continue from
-  while not robot.detectDown() do
-    d()
-  end
-end
-
+----- FINDING -----
 -- Find block in world
 --Cobblestone is used as a filler block
 function findBlock(blockName)
