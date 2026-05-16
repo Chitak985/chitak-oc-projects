@@ -3,6 +3,10 @@ local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
+require("inventoryManager")
+require("crafting")
+require("building")
+require("movement")
 
 ----- VARIABLES -----
 lastFillerSlot = nil  -- Slot of the last filler block (cobblestone)
@@ -22,7 +26,7 @@ function equip()ic.equip()end
 
 ----- DATA -----
 -- Special items (mutiple items with the same display name)
-local itemMap = {
+itemMap = {
   ["Coke Oven Brick (Block)"] = {
     label="Coke Oven Brick",
     name="Railcraft:machine.alpha"
@@ -40,7 +44,7 @@ local itemMap = {
 }
 -- Multiblock construction requirements (mostly used by canBuild())
 -- Multiblock names are formatted as "name|tier"
-local multiblocks = {
+multiblocks = {
   ["Coke Oven"] = {
     {"Coke Oven Brick (Block)", 26}
   },
@@ -78,7 +82,7 @@ local multiblocks = {
 }
 
 -- Crafting construction requirements
-local craftingData = {
+craftingData = {
   ["Hammer"] = {
     {"Stick", 1},
     {"Iron Ingot", 6}
