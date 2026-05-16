@@ -4,6 +4,9 @@ local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
 require("misc")
+require("inventoryManager")
+require("building")
+require("movement")
 
 ----- SINGLEBLOCK SETUP -----
 function setupMachine(machine, tier)
