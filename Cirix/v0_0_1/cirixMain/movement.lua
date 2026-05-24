@@ -228,13 +228,23 @@ end
 ----- FINDING -----
 -- Find block in world
 --Cobblestone is used as a filler block
-function findBlock(blockName)
+function findBlock(blockName, amount)
+  amount = amount or 1
   unselect()
   equip()
   selectItem("Vajra")
   equip()
-  while not hasItem(blockName) do
-    for i = 1,5 do  -- Only do hasItem checks every 5 blocks, saves on time
+  while true do
+    for i = 1,5 do  -- Only do checks every 5 blocks, saves on time
+      if amount == 1 then  -- If only need one block, use hasItem
+        if hasItem(blockName) then
+          break
+        end
+      else  -- If need more than one, use countItem (note that this is much slower)
+        if countItem(blockName) > amount then
+          break
+        end
+      end
       selectFiller()
   
       if lastFillerSlot then  -- Does the robot have an active filler
