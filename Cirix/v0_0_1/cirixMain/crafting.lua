@@ -111,6 +111,39 @@ function setUpCrafting(name, material)
     swapTo(5, 1)
     swapTo(6, 1)
   end
+  if(name == "Unfired Coke Oven Brick") then
+    selectItem("Clay")
+    swapTo(1, 1)
+    swapTo(2, 1)
+    swapTo(3, 1)
+    selectItem("Sand")
+    swapTo(5, 1)
+    swapTo(7, 1)
+    swapTo(9, 1)
+    swapTo(10, 1)
+    swapTo(11, 1)
+    selectItem("Wooden Form (Brick)")
+    swapTo(6, 1)
+  end
+  if(name == "Wooden Form (Brick)") then
+    selectItem("Knife")
+    swapTo(1, 1)
+    selectItem("Blank Pattern")
+    swapTo(2, 1)
+  end
+  if(name == "Knife") then
+    selectItem("Flint")
+    swapTo(1, 1)
+    selectItem("Stick")
+    swapTo(5, 1)
+  end
+  if(name == "Blank Pattern") then
+    selectItem("Paper")
+    swapTo(1, 1)
+    swapTo(2, 1)
+    swapTo(5, 1)
+    swapTo(6, 1)
+  end
   if(name == "Stick") then
     selectItem("Oak Planks")
     swapTo(1, 1)
