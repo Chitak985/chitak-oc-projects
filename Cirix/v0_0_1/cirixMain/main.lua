@@ -120,27 +120,19 @@ else
   swingU()
   b()
   
-  findBlock("Sand")
+  findBlock("Sand", 52)
   origin()
   unloadAllNonToolU()
   lastFillerSlot = nil
   
-  findBlock("Sand")
-  origin()
-  unloadAllNonToolU()
-  lastFillerSlot = nil
-  
-  findBlock("Clay")
-  origin()
-  unloadAllNonToolU()
-  lastFillerSlot = nil
-  
-  findBlock("Clay")
+  findBlock("Clay", 52)
   origin()
   unloadAllNonToolU()
 
   loadAllU()
-  alloySmelt("Coke Oven Brick (Brick)", 4)
+  alloySmelt("Coke Oven Brick (Brick)", 104)
 
-  craft("Coke Oven Brick (Block)","Coke Oven Brick (Brick)", 1)
+  craft("Coke Oven Brick (Block)", "Coke Oven Brick (Brick)", 26)
+
+  buildCokeOven()
 end
