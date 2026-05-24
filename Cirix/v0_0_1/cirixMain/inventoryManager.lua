@@ -85,45 +85,6 @@ function selectItem(name)
   return sel(slot)
 end
 
--- ENSURE ITEM (CRAFTING CORE)
--- i don't know why i still have this
-function ensureItem(name, amount)
-  print("ensureItem("..tostring(name)..", "..tostring(amount)..") called!")
-  amount = amount or 1
-
-  if countItem(name) >= amount then
-    return true
-  end
-
-  local recipe = craftingData[name]
-  if not recipe then
-    return false
-  end
-
-  local missing = amount - countItem(name)
-
-  -- ensure ingredients first
-  for _, req in ipairs(recipe) do
-    local item, count = req[1], req[2]
-    local needed = count * missing
-
-    if countItem(item) < needed then
-      if not ensureItem(item, needed) then
-        return false
-      end
-    end
-  end
-
-  -- craft items
-  for i = 1, missing do
-    clearForCrafting()
-    setUpCrafting(name)
-    cr.craft(1)
-  end
-
-  return true
-end
-
 ----- FILLER LOGIC -----
 -- Select a new filler block to use
 function setFillerSlot()
