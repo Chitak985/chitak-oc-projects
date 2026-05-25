@@ -121,18 +121,28 @@ else
   b()
   
   findBlock("Sand", 52)
+  print("Finding sand complete")
   origin()
+  print("Returned to origin")
   unloadAllNonToolU()
+  print("Unloaded all")
   lastFillerSlot = nil
   
   findBlock("Clay", 52)
+  print("Finding clay complete")
   origin()
+  print("Returned to origin")
   unloadAllNonToolU()
+  print("Unloaded all")
 
   loadAllU()
+  print("Loaded all")
   alloySmelt("Coke Oven Brick (Brick)", 104)
+  print("Alloy smelting complete")
 
   craft("Coke Oven Brick (Block)", "Coke Oven Brick (Brick)", 26)
+  print("Blocks have been crafted")
 
   buildCokeOven()
+  print("done")
 end
