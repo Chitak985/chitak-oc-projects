@@ -111,10 +111,7 @@ else
   d()
   selectItem("Gold Chest")
   placeU()
-  unselect()
-  equip()
-  selectItem("Vajra")
-  equip()
+  equipSafe("Vajra")
   swing()
   f()
   swingU()
@@ -132,16 +129,44 @@ else
   print("Finding clay complete")
   origin()
   print("Returned to origin")
+  
   unloadAllNonToolU()
   print("Unloaded all")
-
   loadAllU()
   print("Loaded all")
+  
+  equipSafe("Vajra")
+  robot.swingUp()
+  print("Removed chest")
+  
   alloySmelt("Coke Oven Brick (Brick)", 104)
   print("Alloy smelting complete")
 
+  selectItem("Cobblestone")
+  place()
+  u()
+  place()
+  d()
+  selectItem("Gold Chest")
+  placeU()
+  equipSafe("Vajra")
+  swing()
+  f()
+  swingU()
+  b()
+  print("Placed chest back")
+  
   craft("Coke Oven Brick (Block)", "Coke Oven Brick (Brick)", 26)
   print("Blocks have been crafted")
+
+  unloadAllNonToolU()
+  print("Unloaded all")
+  loadAllU()
+  print("Loaded all")
+
+  equipSafe("Vajra")
+  robot.swingUp()
+  print("Removed chest")
 
   buildCokeOven()
   print("done")
