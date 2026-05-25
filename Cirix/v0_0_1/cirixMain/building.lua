@@ -4,6 +4,34 @@ local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
 
+----- CLEAR SPACE -----
+function clear3xn(n)
+  equipSafe("Vajra")
+  for i = 1, n - 1, 1 do
+    clearSquare3()
+    swingU()
+    u()
+  end
+  clearSquare3()
+  for i = 1, n - 1, 1 do
+    d()
+  end
+end
+function clearSquare3()
+  for i = 1, 3, 1 do
+    swing()
+    f()
+  end
+  for i = 1, 3, 1 do
+    tr()
+    swing()
+    ta()
+    swing()
+    tr()
+    b()
+  end
+end
+
 ----- SHAPES -----
 function square3()
   f()
@@ -116,6 +144,7 @@ end
 
 ----- MULTIBLOCKS -----
 function buildEBF() --Using old code because new doesn't work
+  clear3xn(4)
   f()
   f()
   f()
@@ -267,6 +296,7 @@ function buildEBF() --Using old code because new doesn't work
   tr()
 end
 function buildCokeOven()
+  clear3xn(3)
   selectItem("Coke Oven Brick (Block)")
   square3()
   u()
@@ -277,6 +307,7 @@ function buildCokeOven()
   d()
 end
 function buildAdvancedCokeOven()
+  clear3xn(4)
   selectItem("Advanced Coke Oven Brick (Block)")
   square3()
   u()
@@ -290,6 +321,7 @@ function buildAdvancedCokeOven()
   d()
 end
 function buildSteamGrinder(tier)
+  clear3xn(3)
   if(tier == 1) then
     selectItem("Bronze Plated Bricks")
   elseif(tier == 2) then
@@ -332,6 +364,7 @@ function buildSteamGrinder(tier)
   d()
 end
 function buildSteamSquasher(tier)
+  -- TODO: clear 4x3 space
   if(tier == 1) then
     selectItem("Bronze Plated Bricks")
   elseif(tier == 2) then
