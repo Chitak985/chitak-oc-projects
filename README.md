@@ -20,7 +20,8 @@ An OpenComputers robot capable of doing **many** things in GTNH!
   - 1x Hopper
 - Run the following inside Cirix.
 ```
-wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/main.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/misc.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/inventoryManager.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/crafting.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/building.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/movement.lua && main```
+wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/main.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/misc.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/inventoryManager.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/crafting.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/building.lua && wget -f https://raw.githubusercontent.com/Chitak985/chitak-oc-projects/refs/heads/main/Cirix/v0_0_1/cirixMain/movement.lua && main
+```
 - Step away and watch how it eats your world to progress through tiers.
 ## Dev stuff
 why won't this work
