@@ -5,11 +5,11 @@ local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
-require("misc")
-require("inventoryManager")
-require("crafting")
-require("building")
-require("movement")
+dofile("misc.lua")
+dofile("inventoryManager.lua")
+dofile("movement.lua")
+dofile("crafting.lua")
+dofile("building.lua")
 
 ----- IDK -----
 function ovens()
