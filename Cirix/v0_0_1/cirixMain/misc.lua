@@ -110,6 +110,14 @@ function unselect()
   -- TODO: Failsafe if no slots left
 end
 
+-- Safe equip (bypasses if something is already equipped)
+function equipSafe(item)
+  unselect()
+  equip()
+  selectItem(item)
+  equip()
+end
+
 -- Can build multi
 function canBuild(name, tier)
   -- Handle tiered multis
