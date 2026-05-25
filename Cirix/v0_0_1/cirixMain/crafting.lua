@@ -6,6 +6,7 @@ local cr = component.crafting
 
 ----- SINGLEBLOCK SETUP -----
 function setupMachine(machine, tier)
+  prepareSetupMachine(machine, tier)
   if(machine == "Compressor") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
       selectItem("Cobblestone")
@@ -47,6 +48,44 @@ function setupMachine(machine, tier)
       d()
       selectItem("Hopper")
       placeU()  -- End under the input hopper (1 block back)
+    end
+  end
+end
+
+----- SINGLEBLOCK SETUP PREPARATIONS -----
+function prepareSetupMachine(machine, tier)
+  if(machine == "Compressor") then
+    if(tier == "LV" or tier == "ULV") then  -- Starts under the machine
+      robot.swing()
+      robot.swingUp()
+      u()
+      robot.swing()
+      ta()
+      robot.swing()
+      ta()
+      d()  -- Return back under the machine
+    end
+  elseif(machine == "Alloy Smelter") then
+    if(tier == "LV" or tier == "ULV") then  -- Starts under the machine
+      robot.swing()
+      robot.swingUp()
+      u()
+      robot.swing()
+      ta()
+      robot.swing()
+      ta()
+      d()  -- Return back under the machine
+    end
+  elseif(machine == "EFurnace") then
+    if(tier == "LV" or tier == "ULV") then  -- Starts under the machine
+      robot.swing()
+      robot.swingUp()
+      u()
+      robot.swing()
+      ta()
+      robot.swing()
+      ta()
+      d()  -- Return back under the machine
     end
   end
 end
