@@ -3,10 +3,6 @@ local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
-require("misc")
-require("crafting")
-require("building")
-require("movement")
 
 ----- INVENTORY -----
 -- Find an item in the inventory
