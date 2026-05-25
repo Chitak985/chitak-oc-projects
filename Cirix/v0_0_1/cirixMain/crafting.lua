@@ -7,6 +7,7 @@ local cr = component.crafting
 ----- SINGLEBLOCK SETUP -----
 function setupMachine(machine, tier)
   prepareSetupMachine(machine, tier)
+  equipSafe("Wrench")
   if(machine == "Compressor") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
       selectItem("Cobblestone")
@@ -17,6 +18,7 @@ function setupMachine(machine, tier)
       b()
       selectItem("Basic Compressor")
       place()
+      robot.useUp(5, true)
       d()
       selectItem("Hopper")
       placeU()  -- End under the input hopper (1 block back)
@@ -31,6 +33,7 @@ function setupMachine(machine, tier)
       b()
       selectItem("Basic Alloy Smelter")
       place()
+      robot.useUp(5, true)
       d()
       selectItem("Hopper")
       placeU()  -- End under the input hopper (1 block back)
@@ -45,6 +48,7 @@ function setupMachine(machine, tier)
       b()
       selectItem("Basic Electric Furnace")
       place()
+      robot.useUp(5, true)
       d()
       selectItem("Hopper")
       placeU()  -- End under the input hopper (1 block back)
@@ -54,6 +58,7 @@ end
 
 ----- SINGLEBLOCK SETUP PREPARATIONS -----
 function prepareSetupMachine(machine, tier)
+  equipSafe("Vajra")
   if(machine == "Compressor") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the machine
       robot.swing()
@@ -92,9 +97,8 @@ end
 
 ----- SINGLEBLOCK DISMANTLE -----
 function dismantleMachine(machine)
+  equipSafe("Vajra")
   if(machine == "Compressor") then  -- Must start under the input hopper
-    selectItem("Vajra")
-    equip()
     swingU()
     f()
     swingU()
@@ -102,8 +106,6 @@ function dismantleMachine(machine)
     f()
     swingU()  -- End where the cobble was (1 block forward from the compressor, 2 forward from input hopper)
   elseif(machine == "Alloy Smelter") then  -- Must start under the input hopper
-    selectItem("Vajra")
-    equip()
     swingU()
     f()
     swingU()
@@ -111,8 +113,6 @@ function dismantleMachine(machine)
     f()
     swingU()  -- End where the cobble was (1 block forward from the compressor, 2 forward from input hopper)
   elseif(machine == "EFurnace") then  -- Must start under the input hopper
-    selectItem("Vajra")
-    equip()
     swingU()
     f()
     swingU()
