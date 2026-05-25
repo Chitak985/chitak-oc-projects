@@ -3,10 +3,6 @@ local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
-require("misc")
-require("inventoryManager")
-require("building")
-require("movement")
 
 ----- SINGLEBLOCK SETUP -----
 function setupMachine(machine, tier)
@@ -38,6 +34,20 @@ function setupMachine(machine, tier)
       selectItem("Hopper")
       placeU()  -- End under the input hopper (1 block back)
     end
+  elseif(machine == "EFurnace") then
+    if(tier == "LV" or tier == "ULV") then  -- Starts under the furnace
+      selectItem("Cobblestone")
+      place()
+      u()
+      selectItem("Basic Solar Panel")
+      place()
+      b()
+      selectItem("Basic Electric Furnace")
+      place()
+      d()
+      selectItem("Hopper")
+      placeU()  -- End under the input hopper (1 block back)
+    end
   end
 end
 
@@ -53,6 +63,15 @@ function dismantleMachine(machine)
     f()
     swingU()  -- End where the cobble was (1 block forward from the compressor, 2 forward from input hopper)
   elseif(machine == "Alloy Smelter") then  -- Must start under the input hopper
+    selectItem("Vajra")
+    equip()
+    swingU()
+    f()
+    swingU()
+    swing()
+    f()
+    swingU()  -- End where the cobble was (1 block forward from the compressor, 2 forward from input hopper)
+  elseif(machine == "EFurnace") then  -- Must start under the input hopper
     selectItem("Vajra")
     equip()
     swingU()
@@ -228,9 +247,9 @@ function alloySmelt(nam, n)
   -- Add input
   if(nam == "Coke Oven Brick (Brick)") then
     selectItem("Sand")
-    robot.dropUp(4 // 0.5)
+    robot.dropUp(n // 0.5)
     selectItem("Clay")
-    robot.dropUp(4 // 0.5)
+    robot.dropUp(n // 0.5)
   end
 
   -- Go to output
@@ -252,4 +271,36 @@ function alloySmelt(nam, n)
   
   -- Finish
   dismantleMachine("Alloy Smelter")
+end
+
+----- SMELTING -----
+function smelt(nam, n)
+  setupMachine("EFurnace", "ULV")  -- TODO: Add handling to use machines from other tiers and a normal furnace
+  local checks = 0
+
+  -- Add input
+  if(nam == "Coke Oven Brick (Brick)") then
+    selectItem("Unfired Coke Oven Brick")
+    robot.dropUp(n)
+  end
+
+  -- Go to output
+  f()
+
+  -- Start cycle
+  while true do
+    robot.suckUp()
+    checks = checks + 1
+    if checks % 10 == 0 then  -- refresh every 10 cycles
+      if(countItem(nam) >= n) then
+        break
+      end
+    end
+  end
+
+  -- Go to input
+  b()
+  
+  -- Finish
+  dismantleMachine("EFurnace")
 end
