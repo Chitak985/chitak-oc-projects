@@ -3,10 +3,6 @@ local component = require("component")
 local robot = require("robot")
 local ic = component.inventory_controller
 local cr = component.crafting
-require("misc")
-require("inventoryManager")
-require("crafting")
-require("building")
 
 ----- VARIABLES -----
 --Rotation:
@@ -222,6 +218,52 @@ function mineUntilBlock()
       end
     end
     d()
+  end
+end
+
+-- Mine out a deposit of gravel/sand/other falling block
+--This function requires the robot to have the block already in its inventory
+function mineFallingDeposit(block)
+  unselect()
+  equip()
+  selectItem("Vajra")
+  equip()
+  selectItem(block)
+  
+  -- Do a blind iteration to avoid any filler blocks
+  swingDown()
+  d()
+
+  -- Dig down until the floor (not a falling block)
+  while robot.compareDown() do
+    robot.swingDown()
+    d()
+  end
+
+  while true do
+    while robot.compare() do
+      robot.swing()
+      f()
+    end
+    tr()
+    if robot.compare() then
+      -- continue (blocks to the right)
+    else
+      ta()
+      if robot.compare() then
+        -- continue (blocks to the left)
+      else
+        if robot.compareDown() then
+          while robot.compareDown() do
+            robot.swingDown()
+            d()
+          end
+          -- continue (moved down one level, may be blocks)
+        else
+          break  -- (no blocks anywhere)
+        end
+      end
+    end
   end
 end
 
