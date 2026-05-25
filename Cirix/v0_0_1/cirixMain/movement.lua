@@ -134,10 +134,7 @@ end
 -- Return to the 0,0,0 position (origin)
 --First matches y, then x, then z
 function origin()
-  unselect()
-  equip()
-  selectItem("Vajra")
-  equip()
+  equipSafe("Vajra")
 
   -- Avoid the chest by not mining straight through it
   --This is only an issue when coming from above to below
@@ -207,10 +204,7 @@ end
 ----- MINING -----
 -- Mine down until cannot
 function mineUntilBlock()
-  unselect()
-  equip()
-  selectItem("Vajra")
-  equip()
+  equipSafe("Vajra")
   while true do
     if not robot.swingDown() then
       if robot.detectDown() then
@@ -224,10 +218,7 @@ end
 -- Mine out a deposit of gravel/sand/other falling block
 --This function requires the robot to have the block already in its inventory
 function mineFallingDeposit(block)
-  unselect()
-  equip()
-  selectItem("Vajra")
-  equip()
+  equipSafe("Vajra")
   selectItem(block)
   
   -- Do a blind iteration to avoid any filler blocks
@@ -272,21 +263,21 @@ end
 --Cobblestone is used as a filler block
 function findBlock(blockName, amount)
   amount = amount or 1
-  unselect()
-  equip()
-  selectItem("Vajra")
-  equip()
+  equipSafe("Vajra")
+  print("findBlock initialized")
   while true do
-    for i = 1,5 do  -- Only do checks every 5 blocks, saves on time
-      if amount == 1 then  -- If only need one block, use hasItem
-        if hasItem(blockName) then
-          break
-        end
-      else  -- If need more than one, use countItem (note that this is much slower)
-        if countItem(blockName) > amount then
-          break
-        end
+    print("Run check")
+    if amount == 1 then  -- If only need one block, use hasItem
+      if hasItem(blockName) then
+        break
       end
+    else  -- If need more than one, use countItem (note that this is much slower)
+      if countItem(blockName) > amount then
+        break
+      end
+    end
+
+    for i = 1,5 do  -- Only do checks every 5 blocks, saves on time
       selectFiller()
   
       if lastFillerSlot then  -- Does the robot have an active filler
@@ -294,15 +285,18 @@ function findBlock(blockName, amount)
           -- If the block isn't a filler, get it and put down the filler
           robot.swingDown()
           robot.placeDown()
+          print("Replaced block with filler")
         end
         -- Otherwise do nothing and leave the filler where it is
       else
         -- Get whatever block is there and leave the space empty
         -- However, this will make the robot go down and up uselessly later
         robot.swingDown()
+        print("Replaced block with nothing")
       end
   
       fTerrestrial()
+      print("Movement successful")
     end
   end
 end
