@@ -117,40 +117,50 @@ else
   swingU()
   b()
   print("Chest constructed")
-
+  
+  hasSand = false
+  hasClay = false
   if countItem("Sand") >= 52 then
+    hasSand = true
     print("Sand already in inventory")
-  else
+  end
+  if countItem("Clay") >= 52 then
+    hasClay = true
+    print("Clay already in inventory")
+  end
+  
+  unloadAllNonToolU()
+  print("Unloaded all")
+
+  if hasSand then
     while true do
       findBlock("Sand")
       print("Finding sand complete")
       mineFallingDeposit("Sand")
       print("Deposit mining complete")
+      origin()
+      print("Returned to origin")
       if countItem("Sand") >= 52 then
         break
       end
     end
-    origin()
-    print("Returned to origin")
   end
   unloadAllNonToolU()
   print("Unloaded all")
   lastFillerSlot = nil
 
-  if countItem("Clay") >= 52 then
-    print("Clay already in inventory")
-  else
+  if not hasClay then
     while true do
       findBlock("Clay")
       print("Finding clay complete")
       mineFallingDeposit("Clay")
       print("Deposit mining complete")
+      origin()
+      print("Returned to origin")
       if countItem("Clay") > 52-1 then
         break
       end
     end
-    origin()
-    print("Returned to origin")
   end
   
   unloadAllNonToolU()
