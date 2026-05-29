@@ -235,6 +235,15 @@ function mineFallingDeposit(block)
     while robot.compare() do
       swing()
       f()
+      ta()
+      swing()
+      tr()
+      tl()
+      suck()
+      f()
+      suck()
+      ta()
+      f()
     end
     tr()
     if robot.compare() then
