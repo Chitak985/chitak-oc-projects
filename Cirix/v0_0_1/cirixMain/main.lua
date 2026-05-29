@@ -132,7 +132,7 @@ else
   unloadAllNonToolU()
   print("Unloaded all")
 
-  if hasSand then
+  if not hasSand then
     while true do
       findBlock("Sand")
       print("Finding sand complete")
