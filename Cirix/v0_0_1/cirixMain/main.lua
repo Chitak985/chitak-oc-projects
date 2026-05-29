@@ -116,17 +116,31 @@ else
   f()
   swingU()
   b()
-  
-  findBlock("Sand", 52)
-  print("Finding sand complete")
+
+  while true do
+    findBlock("Sand")
+    print("Finding sand complete")
+    mineFallingDeposit("Sand")
+    print("Deposit mining complete")
+    if countItem("Sand") > 52-1 then
+      break
+    end
+  end
   origin()
   print("Returned to origin")
   unloadAllNonToolU()
   print("Unloaded all")
   lastFillerSlot = nil
-  
-  findBlock("Clay", 52)
-  print("Finding clay complete")
+
+  while true do
+    findBlock("Clay")
+    print("Finding clay complete")
+    mineFallingDeposit("Clay")
+    print("Deposit mining complete")
+    if countItem("Clay") > 52-1 then
+      break
+    end
+  end
   origin()
   print("Returned to origin")
   
