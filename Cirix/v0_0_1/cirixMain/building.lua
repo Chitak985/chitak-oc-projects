@@ -38,6 +38,7 @@ function make3x3platform()
   clearSquare3()
   selectItem("Cobblestone")
   square3()
+  u()
 end
 
 ----- SHAPES -----
