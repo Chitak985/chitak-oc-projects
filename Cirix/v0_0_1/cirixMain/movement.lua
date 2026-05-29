@@ -222,18 +222,18 @@ function mineFallingDeposit(block)
   selectItem(block)
   
   -- Do a blind iteration to avoid any filler blocks
-  swingDown()
+  swingD()
   d()
 
   -- Dig down until the floor (not a falling block)
   while robot.compareDown() do
-    robot.swingDown()
+    swingD()
     d()
   end
 
   while true do
     while robot.compare() do
-      robot.swing()
+      swing()
       f()
     end
     tr()
@@ -246,7 +246,7 @@ function mineFallingDeposit(block)
       else
         if robot.compareDown() then
           while robot.compareDown() do
-            robot.swingDown()
+            swingD()
             d()
           end
           -- continue (moved down one level, may be blocks)
