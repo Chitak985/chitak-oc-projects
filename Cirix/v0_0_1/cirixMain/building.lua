@@ -31,6 +31,14 @@ function clearSquare3()
     b()
   end
 end
+-- Makes a platform to ensure multi can be built
+function make3x3platform()
+  swingD()
+  d()
+  clearSquare3()
+  selectItem("Cobblestone")
+  square3()
+end
 
 ----- SHAPES -----
 function square3()
@@ -144,7 +152,8 @@ end
 
 ----- MULTIBLOCKS -----
 function buildEBF() --Using old code because new doesn't work
-  clear3xn(4)
+  clear3xn(5)
+  make3x3platform()
   f()
   f()
   f()
@@ -297,6 +306,7 @@ function buildEBF() --Using old code because new doesn't work
 end
 function buildCokeOven()
   clear3xn(3)
+  make3x3platform()
   selectItem("Coke Oven Brick (Block)")
   square3()
   u()
@@ -308,6 +318,7 @@ function buildCokeOven()
 end
 function buildAdvancedCokeOven()
   clear3xn(4)
+  make3x3platform()
   selectItem("Advanced Coke Oven Brick (Block)")
   square3()
   u()
@@ -322,6 +333,7 @@ function buildAdvancedCokeOven()
 end
 function buildSteamGrinder(tier)
   clear3xn(3)
+  make3x3platform()
   if(tier == 1) then
     selectItem("Bronze Plated Bricks")
   elseif(tier == 2) then
