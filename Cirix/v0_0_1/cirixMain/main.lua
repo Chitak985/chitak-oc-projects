@@ -11,6 +11,26 @@ dofile("movement.lua")
 dofile("crafting.lua")
 dofile("building.lua")
 
+----- HELPER FUNCTIONS -----
+function createChest()
+  equipSafe("Vajra")
+  swing()
+  swingU()
+  selectItem("Cobblestone")
+  place()
+  u()
+  swing()
+  place()
+  d()
+  selectItem("Gold Chest")
+  placeU()
+  swing()
+  f()
+  swingU()
+  b()
+  print("Chest constructed")
+end
+
 ----- IDK -----
 function ovens()
   for i = 1,24,1 do
@@ -104,35 +124,19 @@ elseif(hasItem("Electric Blast Furnace")) then
   f()
   tr()
 else
-  selectItem("Cobblestone")
-  place()
-  u()
-  place()
-  d()
-  selectItem("Gold Chest")
-  placeU()
-  equipSafe("Vajra")
-  swing()
-  f()
-  swingU()
-  b()
-  print("Chest constructed")
-  
-  hasSand = false
-  hasClay = false
-  if countItem("Sand") >= 52 then
-    hasSand = true
-    print("Sand already in inventory")
-  end
-  if countItem("Clay") >= 52 then
-    hasClay = true
-    print("Clay already in inventory")
-  end
-  
+  -- Create chest at origin (safely)
+  createChest()
+
+  -- Get initial sand and clay amounts
+  local amountTmpS = countItem("Sand")
+  local amountTmpC = countItem("Clay")
+
+  -- Unload all to optimize inventory space
   unloadAllNonToolU()
   print("Unloaded all")
 
-  if not hasSand then
+  -- Get sand if there isn't enough
+  if amountTmpS < 52 then
     while true do
       findBlock("Sand")
       print("Finding sand complete")
@@ -140,16 +144,23 @@ else
       print("Deposit mining complete")
       origin()
       print("Returned to origin")
-      if countItem("Sand") >= 52 then
+      
+      amountTmpS = amountTmpS + countItem("Sand")
+      if amountTmpS >= 52 then
         break
+      else
+        unloadAllNonToolU()
+        print("Unloaded all")
       end
     end
   end
+  -- Unload all to optimize space (sand isn't needed anymore)
   unloadAllNonToolU()
   print("Unloaded all")
   lastFillerSlot = nil
 
-  if not hasClay then
+  -- Get clay if there isn't enough
+  if amountTmpC < 52 then
     while true do
       findBlock("Clay")
       print("Finding clay complete")
@@ -157,50 +168,56 @@ else
       print("Deposit mining complete")
       origin()
       print("Returned to origin")
-      if countItem("Clay") > 52-1 then
+      
+      amountTmpC = amountTmpC + countItem("Clay")
+      if amountTmpC >= 52 then
         break
+      else
+        unloadAllNonToolU()
+        print("Unloaded all")
       end
     end
   end
-  
+  -- Unload all
   unloadAllNonToolU()
   print("Unloaded all")
+
+  -- Load all (only really need clay and sand)
   loadAllU()
   print("Loaded all")
   
+  -- Remove the chest to make space for machine setups
   equipSafe("Vajra")
   robot.swingUp()
   print("Removed chest")
   
+  -- Make coke oven bricks
   alloySmelt("Coke Oven Brick (Brick)", 104)
   print("Alloy smelting complete")
 
-  selectItem("Cobblestone")
-  place()
-  u()
-  place()
-  d()
-  selectItem("Gold Chest")
-  placeU()
-  equipSafe("Vajra")
-  swing()
-  f()
-  swingU()
-  b()
-  print("Placed chest back")
+  -- Add the chest back and sort inventory
+  createChest()
+  unloadAllNonToolU()
+  print("Unloaded all")
+  loadAllU()
+  print("Loaded all")
   
+  -- Craft coke oven blocks
   craft("Coke Oven Brick (Block)", "Coke Oven Brick (Brick)", 26)
   print("Blocks have been crafted")
 
+  -- Sort inventory using existing chest
   unloadAllNonToolU()
   print("Unloaded all")
   loadAllU()
   print("Loaded all")
 
+  -- Remove the chest to make space for coke oven
   equipSafe("Vajra")
   robot.swingUp()
   print("Removed chest")
 
+  -- Build the coke oven
   buildCokeOven()
   print("done")
 end
