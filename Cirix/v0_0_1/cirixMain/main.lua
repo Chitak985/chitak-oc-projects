@@ -13,21 +13,12 @@ dofile("building.lua")
 
 ----- HELPER FUNCTIONS -----
 function createChest()
-  equipSafe("Vajra")
-  swing()
   swingU()
-  selectItem("Cobblestone")
-  place()
   u()
-  swing()
-  place()
+  swingU()
   d()
   selectItem("Gold Chest")
   placeU()
-  swing()
-  f()
-  swingU()
-  b()
   print("Chest constructed")
 end
 
@@ -188,7 +179,7 @@ else
   
   -- Remove the chest to make space for machine setups
   equipSafe("Vajra")
-  robot.swingUp()
+  swingU()
   print("Removed chest")
   
   -- Make coke oven bricks
@@ -214,7 +205,7 @@ else
 
   -- Remove the chest to make space for coke oven
   equipSafe("Vajra")
-  robot.swingUp()
+  swingU()
   print("Removed chest")
 
   -- Build the coke oven
