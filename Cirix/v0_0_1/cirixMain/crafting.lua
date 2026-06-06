@@ -16,10 +16,11 @@ function setupMachine(machine, tier)
       b()
       selectItem("Basic Compressor")
       place()
-      robot.useUp(5, true)
+      robot.use(5, true)
       d()
       selectItem("Hopper")
-      placeU()  -- End under the input hopper (1 block back)
+      placeU()
+      robot.use(3)  -- End under the input hopper (1 block back)
     end
   elseif(machine == "Alloy Smelter") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
@@ -29,10 +30,11 @@ function setupMachine(machine, tier)
       b()
       selectItem("Basic Alloy Smelter")
       place()
-      robot.useUp(5, true)
+      robot.use(5, true)
       d()
       selectItem("Hopper")
-      placeU()  -- End under the input hopper (1 block back)
+      placeU()
+      robot.use(3)  -- End under the input hopper (1 block back)
     end
   elseif(machine == "EFurnace") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the furnace
@@ -42,10 +44,11 @@ function setupMachine(machine, tier)
       b()
       selectItem("Basic Electric Furnace")
       place()
-      robot.useUp(5, true)
+      robot.use(5, true)
       d()
       selectItem("Hopper")
-      placeU()  -- End under the input hopper (1 block back)
+      placeU()
+      robot.use(3)  -- End under the input hopper (1 block back)
     end
   end
 end
