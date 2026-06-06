@@ -129,6 +129,29 @@ function moveToNext3_3Back()
   f()
   tl()
 end
+-- Doesn't check if can move
+function moveSector11(dir, sectors)
+  sectors = sectors or 1
+  if dir == "f" then
+    for i=1,11*sectors,1 do
+      f()
+    end
+  elseif dit == "b" then
+    for i=1,11*sectors,1 do
+      b()
+    end
+  elseif dir == "u" then
+    for i=1,8*sectors,1 do
+      u()
+    end
+  elseif dit == "d" then
+    for i=1,8*sectors,1 do
+      d()
+    end
+  else
+    print("Invalid direction for moveSector11: "..dir)
+  end
+end
 
 ----- ORIGIN -----
 -- Return to the 0,0,0 position (origin)
