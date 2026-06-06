@@ -10,8 +10,6 @@ function setupMachine(machine, tier)
   equipSafe("Wrench")
   if(machine == "Compressor") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
-      selectItem("Cobblestone")
-      place()
       u()
       selectItem("Basic Solar Panel")
       place()
@@ -25,8 +23,6 @@ function setupMachine(machine, tier)
     end
   elseif(machine == "Alloy Smelter") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the compressor
-      selectItem("Cobblestone")
-      place()
       u()
       selectItem("Basic Solar Panel")
       place()
@@ -40,8 +36,6 @@ function setupMachine(machine, tier)
     end
   elseif(machine == "EFurnace") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the furnace
-      selectItem("Cobblestone")
-      place()
       u()
       selectItem("Basic Solar Panel")
       place()
@@ -61,23 +55,21 @@ function prepareSetupMachine(machine, tier)
   equipSafe("Vajra")
   if(machine == "Compressor") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the machine
-      robot.swing()
-      robot.swingUp()
+      swingU()
       u()
-      robot.swing()
+      swing()
       ta()
-      robot.swing()
+      swing()
       ta()
       d()  -- Return back under the machine
     end
   elseif(machine == "Alloy Smelter") then
     if(tier == "LV" or tier == "ULV") then  -- Starts under the machine
-      robot.swing()
-      robot.swingUp()
+      swingU()
       u()
-      robot.swing()
+      swing()
       ta()
-      robot.swing()
+      swing()
       ta()
       d()  -- Return back under the machine
     end
