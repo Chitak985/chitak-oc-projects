@@ -366,29 +366,41 @@ function buildEBF() --Using old code because new doesn't work
   tr()
 end
 function buildCokeOven()
-  clear3xn(3)
-  selectItem("Coke Oven Brick (Block)")
-  square3()
-  u()
-  square3H()
-  u()
-  square3()
-  d()
-  d()
+  while true do
+    clear3xn(3)
+    selectItem("Coke Oven Brick (Block)")
+    square3()
+    u()
+    square3H()
+    u()
+    square3()
+    d()
+    d()
+    local _, tmp = robot.use()
+    if tmp == "block_activated" then
+      break
+    end
+  end
 end
 function buildAdvancedCokeOven()
-  clear3xn(4)
-  selectItem("Advanced Coke Oven Brick (Block)")
-  square3()
-  u()
-  square3H()
-  u()
-  square3H()
-  u()
-  square3()
-  d()
-  d()
-  d()
+  while true do
+    clear3xn(4)
+    selectItem("Advanced Coke Oven Brick (Block)")
+    square3()
+    u()
+    square3H()
+    u()
+    square3H()
+    u()
+    square3()
+    d()
+    d()
+    d()
+    local _, tmp = robot.use()
+    if tmp == "block_activated" then
+      break
+    end
+  end
 end
 function buildSteamGrinder(tier)
   clear3xn(3)
