@@ -31,14 +31,75 @@ function clearSquare3()
     b()
   end
 end
--- Makes a platform to ensure multi can be built
-function make3x3platform()
-  swingD()
-  d()
-  clearSquare3()
-  selectItem("Cobblestone")
-  square3()
-  u()
+-- Clear a 11x11x8 sector, assume starting in front of the center
+--Stops at the center of the sector (+5 forward)
+function sector11Clean()
+  equipSafe("Vajra")
+  swing()
+  f()
+  tr()
+  for i=1,5,1 do
+    swing()
+    f()
+  end
+  ta()
+  for i=1,5,1 do
+    f()
+  end
+  for i=1,5,1 do
+    swing()
+    f()
+  end
+  ta()
+  for i3=1,10,1 do
+    for i=1,7,1 do
+      swingU()
+      u()
+      for i2=1,10,1 do
+        swing()
+        f()
+      end
+      for i2=1,10,1 do
+        b()
+      end
+    end
+    for i=1,7,1 do
+      d()
+    end
+    tr()
+    swing()
+    f()
+    tl()
+    for i=1,10,1 do
+      swing()
+      f()
+    end
+    for i=1,10,1 do
+      b()
+    end
+  end
+  for i=1,7,1 do
+    swingU()
+    u()
+    for i2=1,10,1 do
+      swing()
+      f()
+    end
+    for i2=1,10,1 do
+      b()
+    end
+  end
+  for i=1,7,1 do
+    d()
+  end
+  for i=1,5,1 do
+    f()
+  end
+  tl()
+  for i=1,5,1 do
+    f()
+  end
+  ta()
 end
 
 ----- SHAPES -----
@@ -154,7 +215,6 @@ end
 ----- MULTIBLOCKS -----
 function buildEBF() --Using old code because new doesn't work
   clear3xn(5)
-  make3x3platform()
   f()
   f()
   f()
@@ -307,7 +367,6 @@ function buildEBF() --Using old code because new doesn't work
 end
 function buildCokeOven()
   clear3xn(3)
-  make3x3platform()
   selectItem("Coke Oven Brick (Block)")
   square3()
   u()
@@ -319,7 +378,6 @@ function buildCokeOven()
 end
 function buildAdvancedCokeOven()
   clear3xn(4)
-  make3x3platform()
   selectItem("Advanced Coke Oven Brick (Block)")
   square3()
   u()
@@ -334,7 +392,6 @@ function buildAdvancedCokeOven()
 end
 function buildSteamGrinder(tier)
   clear3xn(3)
-  make3x3platform()
   if(tier == 1) then
     selectItem("Bronze Plated Bricks")
   elseif(tier == 2) then
